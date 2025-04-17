@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option java_package = "com.ashipo.metropolitanmuseum";
+option java_multiple_files = true;
+
+message Department {
+  int32 id = 1;
+  string name = 2;
+}
+
+message Departments {
+  repeated Department departments = 1;
+}

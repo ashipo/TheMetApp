@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option java_package = "com.ashipo.metropolitanmuseum";
+option java_multiple_files = true;
+
+message SearchPrefs {
+  bool byTitle = 1;
+  bool byArtistOrCulture = 2;
+  bool byTags = 3;
+  bool withImage = 4;
+  bool isHighlight = 5;
+  bool isOnView = 6;
+  bool byDate = 7;
+  sint32 fromYear = 8;
+  sint32 toYear = 9;
+  int32 departmentId = 10;
+  repeated string medium = 11;
+  repeated string geoLocation = 12;
+}
