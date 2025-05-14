@@ -5,14 +5,19 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
@@ -23,18 +28,19 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.runtime.toMutableStateList
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ashipo.metropolitanmuseum.R
 
@@ -80,75 +86,61 @@ fun TagsPicker(
     }
     if (showSelectDialog) {
         TagSelectDialog(
-            initialTags = tags,
+            tags = tags,
             maxTags = maxTags,
             maxTagLength = maxTagLength,
             description = description,
             onDismissRequest = { showSelectDialog = false },
-            onConfirmRequest = {
-                showSelectDialog = false
-                onTagsChange(it)
-            },
+            onTagsChange = onTagsChange,
         )
     }
 }
 
-@Composable
-private fun <T : Any> rememberMutableStateListOf(elements: List<T>): SnapshotStateList<T> {
-    return rememberSaveable(saver = snapshotStateListSaver()) {
-        elements.toMutableStateList()
-    }
-}
-
-private fun <T : Any> snapshotStateListSaver() = listSaver<SnapshotStateList<T>, T>(
-    save = { stateList -> stateList.toList() },
-    restore = { it.toMutableStateList() },
-)
-
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun TagSelectDialog(
-    initialTags: List<String>,
+    tags: List<String>,
     maxTags: Int,
     maxTagLength: Int,
     description: String?,
     onDismissRequest: () -> Unit,
-    onConfirmRequest: (List<String>) -> Unit,
+    onTagsChange: (List<String>) -> Unit,
 ) {
-    val tags = rememberMutableStateListOf(initialTags)
+    var tagText by rememberSaveable { mutableStateOf("") }
+    val canAdd = maxTags == 0 || tags.size < maxTags
+    val addTag = addTag@{
+        if (!canAdd) {
+            return@addTag
+        }
+        val trimmed = tagText.trim()
+        if (trimmed.isNotBlank()) {
+            onTagsChange(tags + trimmed)
+        }
+        tagText = ""
+    }
 
     AlertDialog(
         onDismissRequest = onDismissRequest,
         confirmButton = {
             TextButton(
-                onClick = { onConfirmRequest(tags) },
-                modifier = Modifier.testTag("confirm"),
+                onClick = addTag,
+                enabled = tagText.isNotEmpty() && canAdd,
+                modifier = Modifier.testTag("add")
             ) {
-                Text(stringResource(android.R.string.ok))
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = onDismissRequest,
-                modifier = Modifier.testTag("cancel"),
-            ) {
-                Text(stringResource(android.R.string.cancel))
+                Text(stringResource(R.string.add))
             }
         },
         text = {
-            Column {
-                var tagText by rememberSaveable { mutableStateOf("") }
-                val canAdd = maxTags == 0 || tags.size < maxTags
-                val addTag = addTag@{
-                    if (!canAdd) {
-                        return@addTag
-                    }
-                    val trimmed = tagText.trim()
-                    if (trimmed.isNotBlank()) {
-                        tags.add(trimmed)
-                    }
-                    tagText = ""
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                IconButton(
+                    onClick = onDismissRequest,
+                    modifier = Modifier.align(Alignment.End)
+                ) {
+                    Icon(Icons.Default.Close, stringResource(R.string.close))
                 }
+                description?.let { Text(it) }
                 TextField(
                     value = tagText,
                     onValueChange = {
@@ -182,18 +174,20 @@ private fun TagSelectDialog(
                         onDone = { addTag() }
                     ),
                 )
-                FlowRow(
-                    modifier = Modifier.padding(top = 8.dp)
+                Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState()),
                 ) {
-                    for (i in tags.indices) {
-                        Tag(
-                            tags[i],
-                            { tags.removeAt(i) },
-                            Modifier.padding(horizontal = 4.dp)
-                        )
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        for (i in tags.indices) {
+                            Tag(
+                                tags[i],
+                                { onTagsChange(tags.filterIndexed { index, _ -> index != i }) },
+                            )
+                        }
                     }
                 }
-                description?.let { Text(it) }
             }
         },
     )
@@ -206,7 +200,13 @@ private fun Tag(
     modifier: Modifier = Modifier
 ) {
     InputChip(
-        label = { Text(text) },
+        label = {
+            Text(
+                text = text,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        },
         selected = false,
         onClick = onRemove,
         trailingIcon = {
@@ -217,5 +217,41 @@ private fun Tag(
             )
         },
         modifier = modifier,
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TagsPickerPreview() {
+    val tags = remember {
+        mutableStateListOf(
+            "Tag 1",
+            "Tag 2",
+            "One ".repeat(10),
+            "Two ".repeat(10),
+            "Three ".repeat(10),
+        )
+    }
+
+    TagsPicker(
+        title = "Title",
+        tags = tags,
+        onTagsChange = { tags.clear(); tags.addAll(it) },
+        description = "Description",
+        maxTags = 3,
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TagsPickerPreviewNoDescription() {
+    val tags = remember { mutableStateListOf<String>() }
+
+    TagsPicker(
+        title = "Title",
+        tags = tags,
+        onTagsChange = { tags.clear(); tags.addAll(it) },
+        modifier = Modifier.fillMaxWidth()
     )
 }

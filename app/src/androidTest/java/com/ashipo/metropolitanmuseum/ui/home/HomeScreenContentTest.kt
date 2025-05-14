@@ -9,6 +9,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextReplacement
 import com.ashipo.metropolitanmuseum.department
@@ -396,11 +397,12 @@ class HomeScreenContentTest {
 
         composeTestRule.apply {
             // open dialog
-            onNodeWithTag("medium").performClick()
+            onNodeWithTag("medium").apply {
+                performScrollTo()
+                performClick()
+            }
             // remove a tag
             onNodeWithText("Glass").performClick()
-            // confirm
-            onNodeWithTag("confirm").performClick()
         }
 
         assertEquals(HomeScreenAction.SetMedium(listOf("Cement")), performedAction)
@@ -441,11 +443,12 @@ class HomeScreenContentTest {
 
         composeTestRule.apply {
             // open dialog
-            onNodeWithTag("geoLocation").performClick()
+            onNodeWithTag("geoLocation").apply {
+                performScrollTo()
+                performClick()
+            }
             // remove a tag
             onNodeWithText("Island").performClick()
-            // confirm
-            onNodeWithTag("confirm").performClick()
         }
 
         assertEquals(HomeScreenAction.SetGeoLocation(listOf("City")), performedAction)
