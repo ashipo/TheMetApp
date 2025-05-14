@@ -4,7 +4,6 @@ import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.hasParent
 import androidx.compose.ui.test.hasTestTag
-import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -49,7 +48,10 @@ class HomeScreenContentTest {
             )
         }
 
-        composeTestRule.onNodeWithTag("byTitle").performClick()
+        composeTestRule.onNodeWithTag("byTitle").apply {
+            performScrollTo()
+            performClick()
+        }
 
         assertEquals(HomeScreenAction.SetByTitle(true), performedAction)
     }
@@ -80,7 +82,10 @@ class HomeScreenContentTest {
             )
         }
 
-        composeTestRule.onNodeWithTag("byArtistOrCulture").performClick()
+        composeTestRule.onNodeWithTag("byArtistOrCulture").apply {
+            performScrollTo()
+            performClick()
+        }
 
         assertEquals(HomeScreenAction.SetByArtistOrCulture(true), performedAction)
     }
@@ -111,7 +116,10 @@ class HomeScreenContentTest {
             )
         }
 
-        composeTestRule.onNodeWithTag("byTags").performClick()
+        composeTestRule.onNodeWithTag("byTags").apply {
+            performScrollTo()
+            performClick()
+        }
 
         assertEquals(HomeScreenAction.SetByTags(true), performedAction)
     }
@@ -142,7 +150,10 @@ class HomeScreenContentTest {
             )
         }
 
-        composeTestRule.onNodeWithTag("withImage").performClick()
+        composeTestRule.onNodeWithTag("withImage").apply {
+            performScrollTo()
+            performClick()
+        }
 
         assertEquals(HomeScreenAction.SetWithImage(true), performedAction)
     }
@@ -173,7 +184,10 @@ class HomeScreenContentTest {
             )
         }
 
-        composeTestRule.onNodeWithTag("isHighlight").performClick()
+        composeTestRule.onNodeWithTag("isHighlight").apply {
+            performScrollTo()
+            performClick()
+        }
 
         assertEquals(HomeScreenAction.SetIsHighlight(true), performedAction)
     }
@@ -208,7 +222,15 @@ class HomeScreenContentTest {
             )
         }
 
-        composeTestRule.onNodeWithTag("department:none").isDisplayed()
+        // open dialog
+        composeTestRule.apply {
+            onNodeWithTag("departmentId").apply {
+                performScrollTo()
+                performClick()
+            }
+        }
+
+        composeTestRule.onNodeWithTag("department:none").assertExists()
     }
 
     @Test
@@ -228,8 +250,16 @@ class HomeScreenContentTest {
         }
 
         composeTestRule.apply {
-            onNodeWithTag("departmentId").performClick()
-            onNodeWithText("European").performClick()
+            // open dialog
+            onNodeWithTag("departmentId").apply {
+                performScrollTo()
+                performClick()
+            }
+            // select department
+            onNodeWithText("European").apply {
+                performScrollTo()
+                performClick()
+            }
             onNodeWithTag("confirm").performClick()
         }
 
@@ -261,11 +291,13 @@ class HomeScreenContentTest {
                 onAction = {},
             )
         }
-
         composeTestRule.onNode(hasTestTag("periodPicker:text") and hasParent(hasTestTag("byDate")))
-            .performClick()
+            .apply {
+                performScrollTo()
+                performClick()
+            }
 
-        composeTestRule.onNodeWithTag("fromYear").isDisplayed()
+        composeTestRule.onNodeWithTag("fromYear").assertExists()
     }
 
     // fromYear
@@ -303,8 +335,10 @@ class HomeScreenContentTest {
 
         composeTestRule.apply {
             // open dialog
-            onNode(hasTestTag("periodPicker:text") and hasParent(hasTestTag("byDate")))
-                .performClick()
+            onNode(hasTestTag("periodPicker:text") and hasParent(hasTestTag("byDate"))).apply {
+                performScrollTo()
+                performClick()
+            }
             // modify "from year"
             onNode(hasTestTag("year") and hasParent(hasTestTag("fromYear")))
                 .performTextReplacement("$year")
@@ -350,12 +384,13 @@ class HomeScreenContentTest {
 
         composeTestRule.apply {
             // open dialog
-            onNode(hasTestTag("periodPicker:text") and hasParent(hasTestTag("byDate")))
-                .performClick()
+            onNode(hasTestTag("periodPicker:text") and hasParent(hasTestTag("byDate"))).apply {
+                performScrollTo()
+                performClick()
+            }
             // modify "to year"
             onNode(hasTestTag("year") and hasParent(hasTestTag("toYear")))
                 .performTextReplacement("$year")
-            // click OK
             onNodeWithTag("confirm").performClick()
         }
 
