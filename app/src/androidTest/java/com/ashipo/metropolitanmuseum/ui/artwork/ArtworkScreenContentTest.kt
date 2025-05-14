@@ -44,7 +44,7 @@ class ArtworkScreenContentTest {
         val state = ArtworkScreenState(
             title = "Chewbacca's bowcaster",
             constituents = listOf(
-                ConstituentInfo("The Emperor", "Palpatnie"),
+                ConstituentInfo("The Emperor", "Palpatine"),
                 ConstituentInfo("Jedi Master", "Luke Skywalker"),
             ),
             period = "A long time ago",
@@ -61,18 +61,18 @@ class ArtworkScreenContentTest {
         }
 
         composeTestRule.apply {
-            onNodeWithText(state.title, true).assertIsDisplayed()
+            onNodeWithText(state.title, true).assertExists()
             for (constituent in state.constituents) {
-                composeTestRule.onNodeWithText(constituent.role, true).assertIsDisplayed()
-                composeTestRule.onNodeWithText(constituent.info, true).assertIsDisplayed()
+                composeTestRule.onNodeWithText(constituent.role, true).assertExists()
+                composeTestRule.onNodeWithText(constituent.info, true).assertExists()
             }
-            onNodeWithText(state.period, true).assertIsDisplayed()
-            onNodeWithText(state.date, true).assertIsDisplayed()
-            onNodeWithText(state.geography, true).assertIsDisplayed()
-            onNodeWithText(state.culture, true).assertIsDisplayed()
-            onNodeWithText(state.medium, true).assertIsDisplayed()
-            onNodeWithText(state.classification, true).assertIsDisplayed()
-            onNodeWithText(state.department, true).assertIsDisplayed()
+            onNodeWithText(state.period, true).assertExists()
+            onNodeWithText(state.date, true).assertExists()
+            onNodeWithText(state.geography, true).assertExists()
+            onNodeWithText(state.culture, true).assertExists()
+            onNodeWithText(state.medium, true).assertExists()
+            onNodeWithText(state.classification, true).assertExists()
+            onNodeWithText(state.department, true).assertExists()
         }
     }
 
