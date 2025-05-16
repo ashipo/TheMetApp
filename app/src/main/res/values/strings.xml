@@ -53,7 +53,8 @@
     <string name="not_found_title_template">Couldn\'t load artwork %1$s</string>
     <string name="not_found_desc">The artwork is not available through the public API, but may be available on the museum\'s website</string>
 
-    <string name="artwork_image">Artwork image</string>
+    <string name="artwork_image_template">Image number %1$d</string>
+    <string name="artwork_image_preview_template">Preview image number %1$d</string>
     <string name="title">Title</string>
     <string name="period">Period</string>
     <string name="date">Date</string>

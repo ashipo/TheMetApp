@@ -7,6 +7,7 @@ import cafe.adriel.voyager.koin.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.ashipo.metropolitanmuseum.data.network.model.Artwork
+import com.ashipo.metropolitanmuseum.ui.imageviewer.ImageViewerScreen
 import kotlinx.parcelize.Parcelize
 import org.koin.core.parameter.parametersOf
 
@@ -22,6 +23,9 @@ data class ArtworkScreen(val artwork: Artwork) : Screen, Parcelable {
         ArtworkScreenContent(
             uiState = screenModel.uiState,
             onNavigateBack = navigator::pop,
+            onShowFullscreen = { images, initial ->
+                navigator.push(ImageViewerScreen(images, initial))
+            }
         )
     }
 }

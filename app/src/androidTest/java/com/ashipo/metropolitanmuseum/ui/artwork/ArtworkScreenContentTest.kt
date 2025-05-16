@@ -2,11 +2,12 @@ package com.ashipo.metropolitanmuseum.ui.artwork
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollToNode
 import androidx.test.platform.app.InstrumentationRegistry
 import coil3.ColorImage
 import coil3.ImageLoader
@@ -14,6 +15,7 @@ import coil3.SingletonImageLoader
 import coil3.annotation.DelicateCoilApi
 import coil3.annotation.ExperimentalCoilApi
 import coil3.test.FakeImageLoaderEngine
+import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -29,7 +31,8 @@ class ArtworkScreenContentTest {
         composeTestRule.setContent {
             ArtworkScreenContent(
                 ArtworkScreenState(),
-                { actual = true }
+                { actual = true },
+                { _, _ -> },
             )
         }
 
@@ -57,7 +60,7 @@ class ArtworkScreenContentTest {
         )
 
         composeTestRule.setContent {
-            ArtworkScreenContent(state, {})
+            ArtworkScreenContent(state, {}, { _, _ -> })
         }
 
         composeTestRule.apply {
@@ -77,9 +80,9 @@ class ArtworkScreenContentTest {
     }
 
     @Test
-    fun mainImageAndPreviews_whenArtworkWithImages_areDisplayed() {
+    fun mainImageAndPreviews_whenArtworkWithImages_exist() {
         setupCoil()
-        val images = List(2) { i ->
+        val images = List(20) { i ->
             ArtworkImage(
                 previewUrl = "https://example.com/preview_$i.jpg",
                 imageUrl = "https://example.com/image_$i.jpg",
@@ -88,17 +91,15 @@ class ArtworkScreenContentTest {
 
         composeTestRule.setContent {
             ArtworkScreenContent(
-                ArtworkScreenState(images = images),
-                {},
-            )
+                ArtworkScreenState(images = images), {}, { _, _ -> })
         }
 
         composeTestRule.apply {
             // Main image
-            onNodeWithTag("image:${images[0].imageUrl}", true).assertIsDisplayed()
-            for (image in images) {
-                // Previews
-                onNodeWithTag("preview:${image.previewUrl}").assertIsDisplayed()
+            onNodeWithTag("image", true).assertExists()
+            for (i in images.indices) {
+                // Scroll to a preview (will throw if there is no matching node)
+                onNodeWithTag("previews").performScrollToNode(hasTestTag("preview:$i"))
             }
         }
     }
@@ -106,25 +107,30 @@ class ArtworkScreenContentTest {
     @Test
     fun mainImage_onClick_displaysFullScreen() {
         setupCoil()
-        val images = List(2) { i ->
+        val images = List(10) { i ->
             ArtworkImage(
                 previewUrl = "https://example.com/preview_$i.jpg",
                 imageUrl = "https://example.com/image_$i.jpg",
             )
         }
-
+        val expectedIndex = images.lastIndex
+        var actualIndex: Int? = null
         composeTestRule.setContent {
             ArtworkScreenContent(
-                ArtworkScreenState(images = images),
-                {},
-            )
+                ArtworkScreenState(images = images), {}, { _, index -> actualIndex = index })
         }
 
         composeTestRule.apply {
-            val url = images[0].imageUrl
-            onNodeWithTag("image:$url", true).performClick()
-            onNodeWithTag("imageFullScreen:$url", true).assertIsDisplayed()
+            val tag = "preview:$expectedIndex"
+            // Scroll to a preview
+            onNodeWithTag("previews").performScrollToNode(hasTestTag(tag))
+            // Click the preview
+            onNodeWithTag(tag).performClick()
+            // Click the main image
+            onNodeWithTag("image", true).performClick()
         }
+
+        assertEquals(expectedIndex, actualIndex)
     }
 
     @OptIn(DelicateCoilApi::class, ExperimentalCoilApi::class)
