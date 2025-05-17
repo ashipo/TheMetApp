@@ -9,14 +9,19 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -116,73 +121,68 @@ fun SearchResultScreenContent(
             )
         },
         modifier = modifier
-            .nestedScroll(scrollBehavior.nestedScrollConnection),
+            .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding)
-        ) {
-            when {
-                uiState is SearchResultUiState.Loading
-                        || pagingArtworks.loadState.refresh is LoadState.Loading -> Loading()
+        val contentModifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
+            .consumeWindowInsets(innerPadding)
 
-                // If failed to load artwork ids list
-                uiState is SearchResultUiState.Error ->
-                    Error({ onAction(SearchResultScreenAction.Search) })
+        when {
+            uiState is SearchResultUiState.Loading
+                    || pagingArtworks.loadState.refresh is LoadState.Loading ->
+                LoadingIndicator(contentModifier)
 
-                // If failed to load individual artworks
-                pagingArtworks.loadState.refresh is LoadState.Error ->
-                    Error(pagingArtworks::retry)
+            // If failed to load artwork ids list
+            uiState is SearchResultUiState.Error ->
+                ErrorIndicator({ onAction(SearchResultScreenAction.Search) }, contentModifier)
 
-                else -> Artworks(
-                    pagingArtworks = pagingArtworks,
-                    onShowArtwork = { onAction(SearchResultScreenAction.ShowArtwork(it)) },
-                    onOpenWebpage = { onAction(SearchResultScreenAction.OpenWebpage(it)) },
-                    modifier = Modifier.fillMaxSize()
+            // If failed to load individual artworks
+            pagingArtworks.loadState.refresh is LoadState.Error ->
+                ErrorIndicator(pagingArtworks::retry, contentModifier)
+
+            else -> LazyColumn(
+                contentPadding = innerPadding,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .consumeWindowInsets(innerPadding)
+            ) {
+                items(
+                    count = pagingArtworks.itemCount,
+                    key = pagingArtworks.itemKey { it.id }
+                ) { index ->
+                    Column {
+                        pagingArtworks[index]?.let { artworkResult ->
+                            when (artworkResult) {
+                                is Artwork -> Artwork(
+                                    artwork = artworkResult,
+                                    onShowArtwork = {
+                                        onAction(SearchResultScreenAction.ShowArtwork(artworkResult))
+                                    },
+                                    onOpenWebpage = {
+                                        onAction(SearchResultScreenAction.OpenWebpage(artworkResult))
+                                    },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+
+                                is ArtworkResult.NotFound -> NotFoundPlaceholder(
+                                    artworkResult.id,
+                                    Modifier.fillMaxWidth()
+                                )
+                            }
+                        }
+                    }
+                }
+                appendStateFooter(
+                    appendState = pagingArtworks.loadState.append,
+                    onRetry = pagingArtworks::retry,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun Artworks(
-    pagingArtworks: LazyPagingItems<ArtworkResult>,
-    onShowArtwork: (Artwork) -> Unit,
-    onOpenWebpage: (Artwork) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    LazyColumn(modifier) {
-        items(
-            count = pagingArtworks.itemCount,
-            key = pagingArtworks.itemKey { it.id }
-        ) { index ->
-            Column {
-                pagingArtworks[index]?.let { artworkResult ->
-                    when (artworkResult) {
-                        is Artwork -> Artwork(
-                            artwork = artworkResult,
-                            onShowArtwork = { onShowArtwork(artworkResult) },
-                            onOpenWebpage = { onOpenWebpage(artworkResult) },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        is ArtworkResult.NotFound -> NotFoundPlaceholder(
-                            artworkResult.id,
-                            Modifier.fillMaxWidth()
-                        )
-                    }
-                }
-            }
-        }
-        appendStateFooter(
-            appendState = pagingArtworks.loadState.append,
-            onRetry = pagingArtworks::retry,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-        )
     }
 }
 
@@ -357,33 +357,33 @@ private fun NotFoundPlaceholder(
 }
 
 @Composable
-private fun Loading(
+private fun LoadingIndicator(
     modifier: Modifier = Modifier,
 ) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
     ) {
         CircularProgressIndicator()
     }
 }
 
 @Composable
-private fun Error(
-    retry: () -> Unit,
+private fun ErrorIndicator(
+    onRetry: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
     ) {
         Text(
             text = stringResource(R.string.something_went_wrong),
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(bottom = 8.dp)
         )
-        Button(retry) {
+        Button(onRetry) {
             Icon(Icons.Default.Refresh, null)
             Spacer(Modifier.width(8.dp))
             Text(stringResource(R.string.try_again))

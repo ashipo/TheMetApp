@@ -4,12 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.Navigator
 import com.ashipo.metropolitanmuseum.ui.home.HomeScreen
@@ -23,11 +22,16 @@ class MainActivity : ComponentActivity() {
         setContent {
             MetropolitanMuseumTheme {
                 KoinAndroidContext {
-                    Box(
-                        Modifier.background(MaterialTheme.colorScheme.background)
-                            .windowInsetsPadding(WindowInsets.safeDrawing),
-                    ) {
-                        Navigator(HomeScreen())
+                    Scaffold(
+                        contentWindowInsets = WindowInsets(0, 0, 0, 0),
+                    ) { padding ->
+                        Box(
+                            modifier = Modifier
+                                .padding(padding)
+                                .consumeWindowInsets(padding)
+                        ) {
+                            Navigator(HomeScreen())
+                        }
                     }
                 }
             }
