@@ -1,6 +1,5 @@
 package com.ashipo.metropolitanmuseum.ui.imageviewer
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,25 +14,32 @@ import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import coil3.compose.AsyncImagePainter
-import coil3.compose.rememberAsyncImagePainter
 import com.ashipo.metropolitanmuseum.R
-import me.saket.telephoto.zoomable.ZoomSpec
-import me.saket.telephoto.zoomable.ZoomableContentLocation
-import me.saket.telephoto.zoomable.rememberZoomableState
-import me.saket.telephoto.zoomable.zoomable
+import com.ashipo.metropolitanmuseum.ui.model.ArtworkImage
+import com.github.panpf.sketch.rememberAsyncImageState
+import com.github.panpf.sketch.request.ComposableImageRequest
+import com.github.panpf.sketch.request.LoadState
+import com.github.panpf.sketch.sketch
+import com.github.panpf.sketch.state.ThumbnailMemoryCacheStateImage
+import com.github.panpf.zoomimage.SketchZoomAsyncImage
+import com.github.panpf.zoomimage.rememberSketchZoomState
+import com.github.panpf.zoomimage.zoom.FixedScalesCalculator
 
 @Composable
 fun ImageViewerScreenContent(
-    imagesUrls: List<String>,
+    images: List<ArtworkImage>,
     initialImageIndex: Int,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -50,52 +56,74 @@ fun ImageViewerScreenContent(
             Icon(Icons.Default.Close, stringResource(R.string.close))
         }
 
-        val pagerState = rememberPagerState(initialImageIndex) { imagesUrls.size }
+        val pagerState = rememberPagerState(initialImageIndex) { images.size }
         HorizontalPager(
             state = pagerState,
+            modifier = Modifier
+                .fillMaxSize()
         ) { index ->
-            val painter = rememberAsyncImagePainter(imagesUrls[index])
-            val painterState by painter.state.collectAsState()
-            when (painterState) {
-                is AsyncImagePainter.State.Empty,
-                is AsyncImagePainter.State.Loading -> {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .fillMaxSize()
-                    ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                val imageState = rememberAsyncImageState()
+                val zoomState = rememberSketchZoomState()
+                LaunchedEffect(zoomState.zoomable) {
+                    zoomState.zoomable.scalesCalculator = FixedScalesCalculator(2f)
+                    zoomState.zoomable.keepTransformWhenSameAspectRatioContentSizeChanged = true
+                }
+                val request = ComposableImageRequest(images[index].originalUrl) {
+                    placeholder(ThumbnailMemoryCacheStateImage(images[index].largeUrl))
+                    crossfade(fadeStart = false, durationMillis = 500)
+                }
+
+                var isPlaceholderCached by rememberSaveable { mutableStateOf(false) }
+                val context = LocalContext.current
+                LaunchedEffect(Unit) {
+                    val sketch = context.sketch
+                    val memoryCache = sketch.memoryCache
+                    memoryCache.withLock(images[index].largeUrl) {
+                        // TODO: Refactor this hack (ask author for a better way?)
+                        isPlaceholderCached = keys().any { it.startsWith(images[index].largeUrl) }
+                    }
+                }
+
+                SketchZoomAsyncImage(
+                    request = request,
+                    state = imageState,
+                    zoomState = zoomState,
+                    contentDescription = stringResource(R.string.artwork_image_template)
+                        .format(index + 1),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .zIndex(1f)
+                )
+
+                when (imageState.loadState) {
+                    is LoadState.Started -> {
                         CircularProgressIndicator()
                     }
-                }
 
-                is AsyncImagePainter.State.Success -> {
-                    val zoomableState = rememberZoomableState(ZoomSpec(4f)).apply {
-                        setContentLocation(
-                            ZoomableContentLocation.scaledInsideAndCenterAligned(painter.intrinsicSize)
-                        )
+                    is LoadState.Error -> {
+                        if (!isPlaceholderCached) {
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clickable { imageState.restart() }
+                                    .zIndex(2f)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.reload_failed_image),
+                                    textAlign = TextAlign.Center,
+                                )
+                            }
+                        }
                     }
-                    Image(
-                        painter = painter,
-                        contentDescription = stringResource(R.string.artwork_image_template)
-                            .format(index + 1),
-                        contentScale = ContentScale.Inside,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .zoomable(zoomableState)
-                    )
-                }
 
-                is AsyncImagePainter.State.Error -> {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clickable { painter.restart() }
-                    ) {
-                        Text(
-                            text = stringResource(R.string.reload_failed_image),
-                        )
-                    }
+                    // Success, Canceled, null
+                    else -> {}
                 }
             }
         }

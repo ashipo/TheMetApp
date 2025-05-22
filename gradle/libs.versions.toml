@@ -1,7 +1,6 @@
 [versions]
 androidxActivity = "1.10.1"
 agp = "8.9.1"
-coil = "3.1.0"
 composeBom = "2025.04.00"
 converterGson = "2.11.0"
 coreKtx = "1.16.0"
@@ -20,8 +19,9 @@ paging = "3.3.6"
 protobufPlugin = "0.9.5"
 protobuf = "4.30.2"
 retrofit = "2.11.0"
-telephoto = "0.15.1"
+sketch = "4.1.0"
 voyager = "1.0.1"
+zoomimage = "1.2.0"
 
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivity" }
@@ -40,9 +40,6 @@ androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-datastore = { group = "androidx.datastore", name = "datastore", version.ref = "datastore" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
-coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
-coil-network = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil" }
-coil-test = { group = "io.coil-kt.coil3", name = "coil-test", version.ref = "coil" }
 guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "jupiter" }
@@ -56,10 +53,12 @@ protobuf-kotlin-lite = { group = "com.google.protobuf", name = "protobuf-kotlin-
 protobuf-protoc = { group = "com.google.protobuf", name = "protoc", version.ref = "protobuf" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "converterGson" }
-telephoto-zoomable = { group = "me.saket.telephoto", name = "zoomable", version.ref = "telephoto" }
+sketch-compose = { group = "io.github.panpf.sketch4", name = "sketch-compose", version.ref = "sketch" }
+sketch-http = { group = "io.github.panpf.sketch4", name = "sketch-http", version.ref = "sketch" }
 voyager-koin = { group = "cafe.adriel.voyager", name = "voyager-koin", version.ref = "voyager" }
 voyager-navigator = { group = "cafe.adriel.voyager", name = "voyager-navigator", version.ref = "voyager" }
 voyager-screenmodel = { group = "cafe.adriel.voyager", name = "voyager-screenmodel", version.ref = "voyager" }
+zoomimage-compose-sketch4 = { group = "io.github.panpf.zoomimage", name = "zoomimage-compose-sketch4", version.ref = "zoomimage" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

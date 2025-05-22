@@ -32,5 +32,8 @@ fun LocalDate.toTimestamp(): Timestamp {
  * @param originalUrl URL of the original image (returned in "primaryImage" and "additionalImages"
  * fields)
  */
-fun getImagePreviewUrl(originalUrl: String): String =
+fun getPreviewImageUrl(originalUrl: String): String =
     originalUrl.replace("original", "web-additional")
+
+fun getLargeImageUrl(originalUrl: String): String =
+    originalUrl.replace("original", "web-large")

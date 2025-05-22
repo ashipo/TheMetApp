@@ -15,7 +15,7 @@ class ArtworksRepository(
             async {
                 networkDataSource.getArtwork(id).let { result ->
                     if (result is Artwork) {
-                        result.copy(primaryImagePreviewUrl = getImagePreviewUrl(result.primaryImageUrl))
+                        result.copy(primaryImagePreviewUrl = getPreviewImageUrl(result.primaryImageUrl))
                     } else {
                         result
                     }
