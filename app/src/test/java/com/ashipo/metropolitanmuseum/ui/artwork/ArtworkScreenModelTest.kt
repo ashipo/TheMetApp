@@ -1,9 +1,11 @@
 package com.ashipo.metropolitanmuseum.ui.artwork
 
-import com.ashipo.metropolitanmuseum.data.getImagePreviewUrl
+import com.ashipo.metropolitanmuseum.data.getLargeImageUrl
+import com.ashipo.metropolitanmuseum.data.getPreviewImageUrl
 import com.ashipo.metropolitanmuseum.data.network.model.Artwork
 import com.ashipo.metropolitanmuseum.data.network.model.Constituent
 import com.ashipo.metropolitanmuseum.data.network.model.Tag
+import com.ashipo.metropolitanmuseum.ui.model.ArtworkImage
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -231,7 +233,7 @@ class ArtworkScreenModelTest {
         fun `contains data from images-related Artwork fields`() {
             val primaryImage =
                 "https://images.metmuseum.org/CRDImages/gr/original/DP-18928-001.jpg"
-            val primaryImagePreview = getImagePreviewUrl(primaryImage)
+            val primaryImagePreview = getPreviewImageUrl(primaryImage)
             val additionalImages = listOf(
                 "https://images.metmuseum.org/CRDImages/gr/original/DP-18928-002.jpg",
                 "https://images.metmuseum.org/CRDImages/gr/original/DP-18928-003.jpg",
@@ -243,9 +245,21 @@ class ArtworkScreenModelTest {
                 additionalImagesUrls = additionalImages,
             )
             val expected = buildList {
-                add(ArtworkImage(getImagePreviewUrl(primaryImage), primaryImage))
+                add(
+                    ArtworkImage(
+                        primaryImage,
+                        getLargeImageUrl(primaryImage),
+                        getPreviewImageUrl(primaryImage),
+                    )
+                )
                 additionalImages.forEach { image ->
-                    add(ArtworkImage(getImagePreviewUrl(image), image))
+                    add(
+                        ArtworkImage(
+                            image,
+                            getLargeImageUrl(image),
+                            getPreviewImageUrl(image),
+                        )
+                    )
                 }
             }
 

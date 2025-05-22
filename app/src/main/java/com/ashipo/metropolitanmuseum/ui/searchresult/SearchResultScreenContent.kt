@@ -1,7 +1,6 @@
 package com.ashipo.metropolitanmuseum.ui.searchresult
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,8 +45,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,8 +53,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -75,18 +70,15 @@ import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
-import coil3.ColorImage
-import coil3.annotation.ExperimentalCoilApi
-import coil3.compose.AsyncImagePainter
-import coil3.compose.AsyncImagePreviewHandler
-import coil3.compose.LocalAsyncImagePreviewHandler
-import coil3.compose.rememberAsyncImagePainter
 import com.ashipo.metropolitanmuseum.R
 import com.ashipo.metropolitanmuseum.data.network.model.Artwork
 import com.ashipo.metropolitanmuseum.data.network.model.ArtworkResult
 import com.ashipo.metropolitanmuseum.ui.util.openUrl
+import com.github.panpf.sketch.AsyncImage
+import com.github.panpf.sketch.rememberAsyncImageState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import com.github.panpf.sketch.request.LoadState as SketchLoadState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -401,9 +393,8 @@ private fun ArtworkPreview(
     artwork: Artwork,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+    Box(
+        contentAlignment = Alignment.Center,
         modifier = modifier
             .then(previewSize)
             .background(MaterialTheme.colorScheme.surfaceVariant)
@@ -431,28 +422,24 @@ private fun ArtworkPreview(
                 }
             }
         } else {
-            val painter = rememberAsyncImagePainter(artwork.primaryImagePreviewUrl)
-            val painterState by painter.state.collectAsState()
-            when (painterState) {
-                is AsyncImagePainter.State.Empty,
-                is AsyncImagePainter.State.Loading -> {
+            val imageState = rememberAsyncImageState()
+            AsyncImage(
+                uri = artwork.primaryImagePreviewUrl,
+                state = imageState,
+                contentDescription = stringResource(R.string.artwork_preview),
+                modifier = Modifier.fillMaxSize()
+            )
+            when (imageState.loadState) {
+                is SketchLoadState.Started -> {
                     CircularProgressIndicator()
                 }
 
-                is AsyncImagePainter.State.Success -> {
-                    Image(
-                        painter = painter,
-                        contentDescription = stringResource(R.string.artwork_preview),
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-
-                is AsyncImagePainter.State.Error -> {
+                is SketchLoadState.Error -> {
                     Box(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier
                             .fillMaxSize()
-                            .clickable { painter.restart() }
+                            .clickable { imageState.restart() }
                             .padding(8.dp)
                     ) {
                         Text(
@@ -461,6 +448,9 @@ private fun ArtworkPreview(
                         )
                     }
                 }
+
+                // Success, Canceled, null
+                else -> {}
             }
         }
     }
@@ -478,21 +468,6 @@ private fun ArtworkErrorLoadingPreviewPreview() {
     ArtworkPreview(
         previewUrl = "https:www.test.com"
     )
-}
-
-@OptIn(ExperimentalCoilApi::class)
-@Preview(showBackground = true)
-@Composable
-// Doesn't work, painter.state is always Empty and preview is in loading animation
-private fun ArtworkWithPreviewPreview() {
-    val previewHandler = AsyncImagePreviewHandler {
-        ColorImage(color = Color.Cyan.toArgb(), width = 500, height = 500)
-    }
-    CompositionLocalProvider(LocalAsyncImagePreviewHandler provides previewHandler) {
-        ArtworkPreview(
-            previewUrl = "www.test.com/image.jpg"
-        )
-    }
 }
 
 @Composable

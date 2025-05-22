@@ -1,4 +1,5 @@
 # TheMetApp
+
 An app to search The Metropolitan Museum of Art's collection
 
 ### Stack
@@ -13,9 +14,9 @@ Jetpack Compose, Paging 3, Proto DataStore
 
 [Voyager](https://voyager.adriel.cafe/) - Navigation
 
-[Coil](https://coil-kt.github.io/coil/) - Image loading
+[Sketch](https://panpf.github.io/sketch/) - Image loading
 
-[Telephoto](https://saket.github.io/telephoto/) - Imave viewing
+[ZoomImage](https://panpf.github.io/zoomimage/) - Image zooming
 
 [Guava](https://guava.dev/) - Additional tooling
 

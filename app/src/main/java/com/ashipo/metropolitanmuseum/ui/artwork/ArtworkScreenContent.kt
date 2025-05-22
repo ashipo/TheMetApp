@@ -1,6 +1,5 @@
 package com.ashipo.metropolitanmuseum.ui.artwork
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,8 +31,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -41,28 +38,28 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil3.ColorImage
-import coil3.annotation.ExperimentalCoilApi
-import coil3.compose.AsyncImage
-import coil3.compose.AsyncImagePainter
-import coil3.compose.AsyncImagePreviewHandler
-import coil3.compose.LocalAsyncImagePreviewHandler
-import coil3.compose.rememberAsyncImagePainter
+import androidx.compose.ui.zIndex
 import com.ashipo.metropolitanmuseum.R
+import com.ashipo.metropolitanmuseum.ui.model.ArtworkImage
 import com.ashipo.metropolitanmuseum.ui.util.buildDescriptionString
+import com.github.panpf.sketch.AsyncImage
+import com.github.panpf.sketch.rememberAsyncImageState
+import com.github.panpf.sketch.request.ComposableImageRequest
+import com.github.panpf.sketch.request.LoadState
+import com.github.panpf.sketch.state.ThumbnailMemoryCacheStateImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArtworkScreenContent(
     uiState: ArtworkScreenState,
     onNavigateBack: () -> Unit,
-    onShowFullscreen: (imagesUrls: List<String>, initialImageIndex: Int) -> Unit,
+    onShowFullscreen: (images: List<ArtworkImage>, initialImageIndex: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -98,8 +95,7 @@ fun ArtworkScreenContent(
                 Images(
                     images = uiState.images,
                     onShowFullscreen = { imageIndex ->
-                        val images = uiState.images.map { it.imageUrl }
-                        onShowFullscreen(images, imageIndex)
+                        onShowFullscreen(uiState.images, imageIndex)
                     },
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -171,44 +167,57 @@ private fun Images(
         modifier = modifier,
     ) {
         var currentImageIndex by rememberSaveable { mutableIntStateOf(0) }
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+        Box(
+            contentAlignment = Alignment.Center,
             modifier = Modifier
                 .padding(bottom = 8.dp)
                 .height(300.dp)
                 .clickable { onShowFullscreen(currentImageIndex) }
                 .fillMaxWidth()
         ) {
-            val painter = rememberAsyncImagePainter(images[currentImageIndex].imageUrl)
-            val painterState by painter.state.collectAsState()
-            when (painterState) {
-                is AsyncImagePainter.State.Empty,
-                is AsyncImagePainter.State.Loading -> {
+            val imageState = rememberAsyncImageState()
+            val request = ComposableImageRequest(images[currentImageIndex].largeUrl) {
+                placeholder(ThumbnailMemoryCacheStateImage(images[currentImageIndex].previewUrl))
+                crossfade(fadeStart = false)
+            }
+            // zOrder:
+            // 0 - Progress indicator. Shown below placeholder if it is present
+            // 1 - Image
+            // 2 - Error
+            AsyncImage(
+                request = request,
+                state = imageState,
+                contentDescription = stringResource(R.string.artwork_image_template)
+                    .format(currentImageIndex + 1),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .zIndex(1f)
+                    .testTag("image")
+            )
+
+            when (imageState.loadState) {
+                is LoadState.Started -> {
                     CircularProgressIndicator()
                 }
 
-                is AsyncImagePainter.State.Success -> {
-                    Image(
-                        painter = painter,
-                        contentDescription = stringResource(R.string.artwork_image_template)
-                            .format(currentImageIndex + 1),
-                        modifier = Modifier.testTag("image")
-                    )
-                }
-
-                is AsyncImagePainter.State.Error -> {
+                is LoadState.Error -> {
                     Box(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier
+                            .background(Color(0x7F000000))
                             .fillMaxSize()
-                            .clickable { painter.restart() }
+                            .clickable { imageState.restart() }
+                            .zIndex(2f)
                     ) {
                         Text(
                             text = stringResource(R.string.reload_failed_image),
+                            textAlign = TextAlign.Center,
                         )
                     }
                 }
+
+                // Success, Canceled, null
+                else -> {}
             }
         }
         LazyRow(
@@ -220,13 +229,21 @@ private fun Images(
                 count = images.size,
                 key = { images[it].previewUrl }
             ) { index ->
+                val imageState = rememberAsyncImageState()
                 AsyncImage(
-                    model = images[index].previewUrl,
+                    uri = images[index].previewUrl,
+                    state = imageState,
                     contentDescription = stringResource(R.string.artwork_image_preview_template)
                         .format(index + 1),
                     modifier = previewSize
                         .background(MaterialTheme.colorScheme.surfaceVariant)
-                        .clickable { currentImageIndex = index }
+                        .clickable {
+                            // TODO: Doesn't work sometimes
+                            if (imageState.loadState is LoadState.Error) {
+                                imageState.restart()
+                            }
+                            currentImageIndex = index
+                        }
                         .testTag("preview:$index")
                 )
             }
@@ -234,7 +251,6 @@ private fun Images(
     }
 }
 
-@OptIn(ExperimentalCoilApi::class)
 @Preview(
     device = "spec:width=1080px,height=2340px,dpi=440,cutout=tall,navigation=buttons",
     showSystemUi = true,
@@ -252,15 +268,10 @@ private fun ArtworkScreenPreview() {
         geography = "Egypt",
         medium = "Stone",
         images = listOf(
-            ArtworkImage("p1", "m1"),
-            ArtworkImage("p2", "m2"),
-            ArtworkImage("p3", "m3"),
+            ArtworkImage("o1", "l1", "p1"),
+            ArtworkImage("o2", "l2", "p2"),
+            ArtworkImage("o3", "l3", "p3"),
         ),
     )
-    val previewHandler = AsyncImagePreviewHandler {
-        ColorImage(color = Color.Cyan.toArgb(), width = 500, height = 500)
-    }
-    CompositionLocalProvider(LocalAsyncImagePreviewHandler provides previewHandler) {
-        ArtworkScreenContent(uiState, {}, { _, _ -> })
-    }
+    ArtworkScreenContent(uiState, {}, { _, _ -> })
 }

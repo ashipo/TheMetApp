@@ -1,8 +1,10 @@
 package com.ashipo.metropolitanmuseum.ui.artwork
 
 import cafe.adriel.voyager.core.model.ScreenModel
-import com.ashipo.metropolitanmuseum.data.getImagePreviewUrl
+import com.ashipo.metropolitanmuseum.data.getLargeImageUrl
+import com.ashipo.metropolitanmuseum.data.getPreviewImageUrl
 import com.ashipo.metropolitanmuseum.data.network.model.Artwork
+import com.ashipo.metropolitanmuseum.ui.model.ArtworkImage
 
 class ArtworkScreenModel(
     artwork: Artwork,
@@ -40,13 +42,17 @@ private fun getImages(artwork: Artwork): List<ArtworkImage> {
         return emptyList()
     }
     val images = mutableListOf<ArtworkImage>()
-    images.add(ArtworkImage(artwork.primaryImagePreviewUrl, artwork.primaryImageUrl))
+    val primaryLarge = getLargeImageUrl(artwork.primaryImageUrl)
+    val primaryPreview = artwork.primaryImagePreviewUrl
+    images.add(ArtworkImage(artwork.primaryImageUrl, primaryLarge, primaryPreview))
+
     if (artwork.additionalImagesUrls.isNullOrEmpty()) {
         return images
     }
-    for (url in artwork.additionalImagesUrls) {
-        val previewUrl = getImagePreviewUrl(url)
-        images.add(ArtworkImage(previewUrl, url))
+    for (original in artwork.additionalImagesUrls) {
+        val preview = getPreviewImageUrl(original)
+        val large = getLargeImageUrl(original)
+        images.add(ArtworkImage(original, large, preview))
     }
     return images
 }
@@ -108,7 +114,5 @@ data class ArtworkScreenState(
     val images: List<ArtworkImage> = emptyList(),
     val tags: List<String> = emptyList(),
 )
-
-data class ArtworkImage(val previewUrl: String, val imageUrl: String)
 
 data class ConstituentInfo(val role: String, val info: String)

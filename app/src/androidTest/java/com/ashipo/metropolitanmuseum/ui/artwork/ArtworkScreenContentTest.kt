@@ -1,20 +1,12 @@
 package com.ashipo.metropolitanmuseum.ui.artwork
 
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
-import androidx.test.platform.app.InstrumentationRegistry
-import coil3.ColorImage
-import coil3.ImageLoader
-import coil3.SingletonImageLoader
-import coil3.annotation.DelicateCoilApi
-import coil3.annotation.ExperimentalCoilApi
-import coil3.test.FakeImageLoaderEngine
+import com.ashipo.metropolitanmuseum.ui.model.ArtworkImage
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import org.junit.Rule
@@ -81,11 +73,11 @@ class ArtworkScreenContentTest {
 
     @Test
     fun mainImageAndPreviews_whenArtworkWithImages_exist() {
-        setupCoil()
         val images = List(20) { i ->
             ArtworkImage(
+                originalUrl = "https://example.com/image_$i.jpg",
                 previewUrl = "https://example.com/preview_$i.jpg",
-                imageUrl = "https://example.com/image_$i.jpg",
+                largeUrl = "https://example.com/large_$i.jpg",
             )
         }
 
@@ -106,11 +98,11 @@ class ArtworkScreenContentTest {
 
     @Test
     fun mainImage_onClick_displaysFullScreen() {
-        setupCoil()
         val images = List(10) { i ->
             ArtworkImage(
+                originalUrl = "https://example.com/image_$i.jpg",
                 previewUrl = "https://example.com/preview_$i.jpg",
-                imageUrl = "https://example.com/image_$i.jpg",
+                largeUrl = "https://example.com/large_$i.jpg",
             )
         }
         val expectedIndex = images.lastIndex
@@ -131,17 +123,5 @@ class ArtworkScreenContentTest {
         }
 
         assertEquals(expectedIndex, actualIndex)
-    }
-
-    @OptIn(DelicateCoilApi::class, ExperimentalCoilApi::class)
-    private fun setupCoil() {
-        val engine = FakeImageLoaderEngine.Builder()
-            .default(ColorImage(Color.Blue.toArgb()))
-            .build()
-        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        val imageLoader = ImageLoader.Builder(appContext)
-            .components { add(engine) }
-            .build()
-        SingletonImageLoader.setUnsafe(imageLoader)
     }
 }
