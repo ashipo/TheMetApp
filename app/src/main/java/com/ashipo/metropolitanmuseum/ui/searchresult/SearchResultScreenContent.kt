@@ -65,6 +65,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
@@ -401,23 +402,30 @@ private fun ArtworkPreview(
             .semantics(mergeDescendants = true) {}
     ) {
         if (artwork.primaryImagePreviewUrl.isBlank()) {
-            Text(stringResource(R.string.no_preview))
-            if (!artwork.isPublicDomain) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
                 Text(
-                    text = stringResource(R.string.not_in_public_domain),
+                    text = stringResource(R.string.no_image),
                     textAlign = TextAlign.Center,
                 )
-                val tooltipState = rememberTooltipState()
-                val scope = rememberCoroutineScope()
-                TooltipBox(
-                    positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                    tooltip = {
-                        PlainTooltip { Text(stringResource(R.string.not_in_public_domain_tooltip)) }
-                    },
-                    state = tooltipState,
-                ) {
-                    IconButton({ scope.launch { tooltipState.show() } }) {
-                        Icon(Icons.Default.Info, stringResource(R.string.show_additional_info))
+                if (!artwork.isPublicDomain) {
+                    Text(
+                        text = stringResource(R.string.not_in_public_domain),
+                        textAlign = TextAlign.Center,
+                    )
+                    val tooltipState = rememberTooltipState()
+                    val scope = rememberCoroutineScope()
+                    TooltipBox(
+                        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                        tooltip = {
+                            PlainTooltip { Text(stringResource(R.string.not_in_public_domain_tooltip)) }
+                        },
+                        state = tooltipState,
+                    ) {
+                        IconButton({ scope.launch { tooltipState.show() } }) {
+                            Icon(Icons.Default.Info, stringResource(R.string.show_additional_info))
+                        }
                     }
                 }
             }
@@ -427,11 +435,12 @@ private fun ArtworkPreview(
                 uri = artwork.primaryImagePreviewUrl,
                 state = imageState,
                 contentDescription = stringResource(R.string.artwork_preview),
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
             )
             when (imageState.loadState) {
                 is SketchLoadState.Started -> {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(Modifier.zIndex(1f))
                 }
 
                 is SketchLoadState.Error -> {
@@ -441,6 +450,7 @@ private fun ArtworkPreview(
                             .fillMaxSize()
                             .clickable { imageState.restart() }
                             .padding(8.dp)
+                            .zIndex(1f)
                     ) {
                         Text(
                             text = stringResource(R.string.reload_failed_image),
