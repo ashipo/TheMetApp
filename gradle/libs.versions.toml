@@ -1,6 +1,6 @@
 [versions]
 androidxActivity = "1.10.1"
-agp = "8.9.1"
+agp = "8.10.0"
 composeBom = "2025.04.00"
 converterGson = "2.11.0"
 coreKtx = "1.16.0"
