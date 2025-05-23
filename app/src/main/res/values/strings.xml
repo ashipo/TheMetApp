@@ -42,7 +42,7 @@
 
     <string name="found_template">Found: %1$s</string>
     <string name="artwork_preview">Artwork preview</string>
-    <string name="no_preview">No preview.</string>
+    <string name="no_image">No image.</string>
     <string name="not_in_public_domain">Not in Public Domain.</string>
     <string name="not_in_public_domain_tooltip">Images of artworks not in the public domain are not available through the public API but may be accessible on the museum\'s website.</string>
     <string name="show_additional_info">Show additional info</string>
