@@ -46,6 +46,12 @@ android {
     }
 }
 
+composeCompiler {
+    stabilityConfigurationFiles.addAll(
+        rootProject.layout.projectDirectory.file("sketch_stability_config.conf"),
+    )
+}
+
 protobuf {
     protoc {
         artifact = libs.protobuf.protoc.get().toString()
