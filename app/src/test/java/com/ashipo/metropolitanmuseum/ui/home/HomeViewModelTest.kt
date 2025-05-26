@@ -22,18 +22,18 @@ import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ExtendWith(MainDispatcherExtension::class)
-@DisplayName("HomeScreenModel")
-class HomeScreenModelTest {
+@DisplayName("HomeViewModel")
+class HomeViewModelTest {
 
     private lateinit var departmentRepository: TestDepartmentRepository
     private lateinit var searchPrefsRepository: TestSearchPrefsRepository
-    private lateinit var subject: HomeScreenModel
+    private lateinit var subject: HomeViewModel
 
     @BeforeEach
     fun setup() {
         departmentRepository = TestDepartmentRepository()
         searchPrefsRepository = TestSearchPrefsRepository()
-        subject = HomeScreenModel(departmentRepository, searchPrefsRepository)
+        subject = HomeViewModel(departmentRepository, searchPrefsRepository)
     }
 
     @Test

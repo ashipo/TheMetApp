@@ -7,7 +7,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.ashipo.metropolitanmuseum.data.network.model.Artwork
 import com.ashipo.metropolitanmuseum.ui.artwork.ArtworkScreenContent
-import com.ashipo.metropolitanmuseum.ui.artwork.ArtworkScreenModel
+import com.ashipo.metropolitanmuseum.ui.artwork.ArtworkViewModel
 import com.ashipo.metropolitanmuseum.ui.model.ImageViewerParams
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
@@ -36,7 +36,7 @@ fun ArtworkRoute(
     onShowFullscreen: (ImageViewerParams) -> Unit,
     onNavigateUp: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ArtworkScreenModel = koinViewModel(),
+    viewModel: ArtworkViewModel = koinViewModel(),
 ) {
     ArtworkScreenContent(
         uiState = viewModel.uiState,

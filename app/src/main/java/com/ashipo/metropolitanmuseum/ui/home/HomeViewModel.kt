@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class HomeScreenModel(
+class HomeViewModel(
     departmentRepository: DepartmentRepository,
     private val searchPrefsRepository: SearchPrefsRepository,
 ) : ViewModel() {

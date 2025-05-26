@@ -11,7 +11,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.ashipo.metropolitanmuseum.data.network.model.Artwork
 import com.ashipo.metropolitanmuseum.ui.searchresult.SearchResultScreenAction
 import com.ashipo.metropolitanmuseum.ui.searchresult.SearchResultScreenContent
-import com.ashipo.metropolitanmuseum.ui.searchresult.SearchResultScreenModel
+import com.ashipo.metropolitanmuseum.ui.searchresult.SearchResultViewModel
 import com.ashipo.metropolitanmuseum.ui.util.openUrl
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
@@ -37,7 +37,7 @@ fun SearchResultRoute(
     onShowArtwork: (Artwork) -> Unit,
     onNavigateUp: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: SearchResultScreenModel = koinViewModel(),
+    viewModel: SearchResultViewModel = koinViewModel(),
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     val pagingArtworks = viewModel.pagingArtworks.collectAsLazyPagingItems()

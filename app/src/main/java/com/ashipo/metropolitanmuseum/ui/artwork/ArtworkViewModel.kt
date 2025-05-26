@@ -11,7 +11,7 @@ import com.ashipo.metropolitanmuseum.ui.artwork.navigation.ArtworkType
 import com.ashipo.metropolitanmuseum.ui.model.ArtworkImage
 import kotlin.reflect.typeOf
 
-class ArtworkScreenModel(
+class ArtworkViewModel(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 

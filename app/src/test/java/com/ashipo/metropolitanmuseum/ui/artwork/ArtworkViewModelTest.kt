@@ -18,7 +18,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @RunWith(RobolectricTestRunner::class)
-class ArtworkScreenModelTest {
+class ArtworkViewModelTest {
 
     private val typeMap = mapOf(typeOf<Artwork>() to ArtworkType)
 
@@ -29,7 +29,7 @@ class ArtworkScreenModelTest {
             id = expected,
         )
 
-        val model = ArtworkScreenModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
+        val model = ArtworkViewModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
         val actual = model.uiState.id
 
         assertEquals(expected, actual)
@@ -43,7 +43,7 @@ class ArtworkScreenModelTest {
             title = expected,
         )
 
-        val model = ArtworkScreenModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
+        val model = ArtworkViewModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
         val actual = model.uiState.title
 
         assertEquals(expected, actual)
@@ -60,7 +60,7 @@ class ArtworkScreenModelTest {
             objectName = expected,
         )
 
-        val model = ArtworkScreenModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
+        val model = ArtworkViewModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
         val actual = model.uiState.title
 
         assertEquals(expected, actual)
@@ -83,7 +83,7 @@ class ArtworkScreenModelTest {
             constituents = constituents,
         )
 
-        val model = ArtworkScreenModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
+        val model = ArtworkViewModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
         val actual = model.uiState.constituents
 
         assertEquals(constituents.size, actual.size)
@@ -103,7 +103,7 @@ class ArtworkScreenModelTest {
             period = expected,
         )
 
-        val model = ArtworkScreenModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
+        val model = ArtworkViewModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
         val actual = model.uiState.period
 
         assertEquals(expected, actual)
@@ -117,7 +117,7 @@ class ArtworkScreenModelTest {
             date = expected,
         )
 
-        val model = ArtworkScreenModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
+        val model = ArtworkViewModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
         val actual = model.uiState.date
 
         assertEquals(expected, actual)
@@ -139,7 +139,7 @@ class ArtworkScreenModelTest {
             river = "Volga river",
         )
 
-        val model = ArtworkScreenModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
+        val model = ArtworkViewModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
         val actual = model.uiState.geography
 
         assertTrue(actual.contains("Amsterdam"))
@@ -162,7 +162,7 @@ class ArtworkScreenModelTest {
             culture = expected,
         )
 
-        val model = ArtworkScreenModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
+        val model = ArtworkViewModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
         val actual = model.uiState.culture
 
         assertEquals(expected, actual)
@@ -176,7 +176,7 @@ class ArtworkScreenModelTest {
             medium = expected,
         )
 
-        val model = ArtworkScreenModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
+        val model = ArtworkViewModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
         val actual = model.uiState.medium
 
         assertEquals(expected, actual)
@@ -190,7 +190,7 @@ class ArtworkScreenModelTest {
             classification = expected,
         )
 
-        val model = ArtworkScreenModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
+        val model = ArtworkViewModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
         val actual = model.uiState.classification
 
         assertEquals(expected, actual)
@@ -204,7 +204,7 @@ class ArtworkScreenModelTest {
             department = expected,
         )
 
-        val model = ArtworkScreenModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
+        val model = ArtworkViewModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
         val actual = model.uiState.department
 
         assertEquals(expected, actual)
@@ -217,7 +217,7 @@ class ArtworkScreenModelTest {
             primaryImageUrl = "  ",
         )
 
-        val model = ArtworkScreenModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
+        val model = ArtworkViewModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
         val actual = model.uiState.images
 
         assertTrue { actual.isEmpty() }
@@ -258,7 +258,7 @@ class ArtworkScreenModelTest {
             }
         }
 
-        val model = ArtworkScreenModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
+        val model = ArtworkViewModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
         val actual = model.uiState.images
 
         assertEquals(expected, actual)
@@ -270,7 +270,7 @@ class ArtworkScreenModelTest {
             tags = null,
         )
 
-        val model = ArtworkScreenModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
+        val model = ArtworkViewModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
         val actual = model.uiState.tags
 
         assertTrue { actual.isEmpty() }
@@ -288,7 +288,7 @@ class ArtworkScreenModelTest {
         )
         val expected = tags.map { it.term }
 
-        val model = ArtworkScreenModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
+        val model = ArtworkViewModel(SavedStateHandle(ArtworkRoute(artwork), typeMap))
         val actual = model.uiState.tags
 
         assertEquals(expected, actual)

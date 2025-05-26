@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class SearchResultScreenModel(
+class SearchResultViewModel(
     private val searchResultRepository: SearchResultRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {

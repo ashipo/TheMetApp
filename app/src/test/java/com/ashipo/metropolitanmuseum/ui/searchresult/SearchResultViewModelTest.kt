@@ -17,7 +17,7 @@ import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
-class SearchResultScreenModelTest {
+class SearchResultViewModelTest {
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
@@ -25,7 +25,7 @@ class SearchResultScreenModelTest {
     @Test
     fun `uiState - initial value - is Loading`() = runTest {
         val searchResultRepository = TestSearchResultRepository()
-        val subject = SearchResultScreenModel(
+        val subject = SearchResultViewModel(
             searchResultRepository,
             SavedStateHandle(SearchResultRoute("Query")),
         )
@@ -41,7 +41,7 @@ class SearchResultScreenModelTest {
         searchResultRepository.setSearchResult(
             Result.failure(IOException("test exception"))
         )
-        val subject = SearchResultScreenModel(
+        val subject = SearchResultViewModel(
             searchResultRepository,
             SavedStateHandle(SearchResultRoute("Query")),
         )
@@ -59,7 +59,7 @@ class SearchResultScreenModelTest {
         searchResultRepository.setSearchResult(
             Result.success(resultIds)
         )
-        val subject = SearchResultScreenModel(
+        val subject = SearchResultViewModel(
             searchResultRepository,
             SavedStateHandle(SearchResultRoute("Query")),
         )
