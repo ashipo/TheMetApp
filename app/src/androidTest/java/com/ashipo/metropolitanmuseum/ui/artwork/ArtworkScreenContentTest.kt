@@ -24,7 +24,7 @@ class ArtworkScreenContentTest {
             ArtworkScreenContent(
                 ArtworkScreenState(),
                 { actual = true },
-                { _, _ -> },
+                {},
             )
         }
 
@@ -52,7 +52,7 @@ class ArtworkScreenContentTest {
         )
 
         composeTestRule.setContent {
-            ArtworkScreenContent(state, {}, { _, _ -> })
+            ArtworkScreenContent(state, {}, {})
         }
 
         composeTestRule.apply {
@@ -83,7 +83,7 @@ class ArtworkScreenContentTest {
 
         composeTestRule.setContent {
             ArtworkScreenContent(
-                ArtworkScreenState(images = images), {}, { _, _ -> })
+                ArtworkScreenState(images = images), {}, {})
         }
 
         composeTestRule.apply {
@@ -109,7 +109,7 @@ class ArtworkScreenContentTest {
         var actualIndex: Int? = null
         composeTestRule.setContent {
             ArtworkScreenContent(
-                ArtworkScreenState(images = images), {}, { _, index -> actualIndex = index })
+                ArtworkScreenState(images = images), {}, { actualIndex = it })
         }
 
         composeTestRule.apply {
