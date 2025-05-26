@@ -1,14 +1,23 @@
 package com.ashipo.metropolitanmuseum.ui.artwork
 
-import cafe.adriel.voyager.core.model.ScreenModel
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.navigation.toRoute
 import com.ashipo.metropolitanmuseum.data.getLargeImageUrl
 import com.ashipo.metropolitanmuseum.data.getPreviewImageUrl
 import com.ashipo.metropolitanmuseum.data.network.model.Artwork
+import com.ashipo.metropolitanmuseum.ui.artwork.navigation.ArtworkRoute
+import com.ashipo.metropolitanmuseum.ui.artwork.navigation.ArtworkType
 import com.ashipo.metropolitanmuseum.ui.model.ArtworkImage
+import kotlin.reflect.typeOf
 
 class ArtworkScreenModel(
-    artwork: Artwork,
-) : ScreenModel {
+    savedStateHandle: SavedStateHandle,
+) : ViewModel() {
+
+    private val artwork: Artwork = savedStateHandle.toRoute<ArtworkRoute>(
+        typeMap = mapOf(typeOf<Artwork>() to ArtworkType)
+    ).artwork
 
     val uiState: ArtworkScreenState = ArtworkScreenState(
         id = artwork.id,

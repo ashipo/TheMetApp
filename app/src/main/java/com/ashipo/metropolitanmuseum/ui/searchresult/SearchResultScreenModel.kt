@@ -1,23 +1,28 @@
 package com.ashipo.metropolitanmuseum.ui.searchresult
 
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
 import com.ashipo.metropolitanmuseum.data.SearchResultRepository
-import com.ashipo.metropolitanmuseum.data.network.model.ArtworkResult
 import com.ashipo.metropolitanmuseum.data.network.PAGE_SIZE
+import com.ashipo.metropolitanmuseum.data.network.model.ArtworkResult
+import com.ashipo.metropolitanmuseum.ui.searchresult.navigation.SearchResultRoute
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class SearchResultScreenModel(
-    private val searchQuery: String,
     private val searchResultRepository: SearchResultRepository,
-) : ScreenModel {
+    savedStateHandle: SavedStateHandle,
+) : ViewModel() {
+
+    private val query = savedStateHandle.toRoute<SearchResultRoute>().query
     private val _uiState = MutableStateFlow<SearchResultUiState>(SearchResultUiState.Loading)
     val uiState: StateFlow<SearchResultUiState>
         get() = _uiState
@@ -30,16 +35,16 @@ class SearchResultScreenModel(
         pagingSourceFactory = searchResultRepository.pagingSourceFactory,
     )
 
-    val pagingArtworks: Flow<PagingData<ArtworkResult>> = pager.flow.cachedIn(screenModelScope)
+    val pagingArtworks: Flow<PagingData<ArtworkResult>> = pager.flow.cachedIn(viewModelScope)
 
     init {
         search()
     }
 
     private fun search() {
-        screenModelScope.launch {
+        viewModelScope.launch {
             _uiState.value = SearchResultUiState.Loading
-            val searchResult = searchResultRepository.search(searchQuery).getOrNull()
+            val searchResult = searchResultRepository.search(query).getOrNull()
             if (searchResult == null) {
                 _uiState.value = SearchResultUiState.Error
             } else {

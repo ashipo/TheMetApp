@@ -59,7 +59,7 @@ import com.github.panpf.sketch.state.ThumbnailMemoryCacheStateImage
 fun ArtworkScreenContent(
     uiState: ArtworkScreenState,
     onNavigateBack: () -> Unit,
-    onShowFullscreen: (images: List<ArtworkImage>, initialImageIndex: Int) -> Unit,
+    onShowFullscreen: (imageIndex: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -94,9 +94,7 @@ fun ArtworkScreenContent(
             if (uiState.images.isNotEmpty()) {
                 Images(
                     images = uiState.images,
-                    onShowFullscreen = { imageIndex ->
-                        onShowFullscreen(uiState.images, imageIndex)
-                    },
+                    onShowFullscreen = onShowFullscreen,
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
@@ -273,5 +271,5 @@ private fun ArtworkScreenPreview() {
             ArtworkImage("o3", "l3", "p3"),
         ),
     )
-    ArtworkScreenContent(uiState, {}, { _, _ -> })
+    ArtworkScreenContent(uiState, {}, {})
 }
