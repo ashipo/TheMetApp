@@ -23,7 +23,6 @@ protobuf = "4.30.2"
 retrofit = "2.11.0"
 robolectric = "4.14.1"
 sketch = "4.1.0"
-voyager = "1.0.1"
 zoomimage = "1.3.0"
 
 [libraries]
@@ -67,9 +66,6 @@ retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
 sketch-compose = { group = "io.github.panpf.sketch4", name = "sketch-compose", version.ref = "sketch" }
 sketch-http = { group = "io.github.panpf.sketch4", name = "sketch-http", version.ref = "sketch" }
-voyager-koin = { group = "cafe.adriel.voyager", name = "voyager-koin", version.ref = "voyager" }
-voyager-navigator = { group = "cafe.adriel.voyager", name = "voyager-navigator", version.ref = "voyager" }
-voyager-screenmodel = { group = "cafe.adriel.voyager", name = "voyager-screenmodel", version.ref = "voyager" }
 zoomimage-compose-sketch4 = { group = "io.github.panpf.zoomimage", name = "zoomimage-compose-sketch4", version.ref = "zoomimage" }
 
 [plugins]

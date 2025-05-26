@@ -12,8 +12,6 @@ Jetpack Compose, Paging 3, Proto DataStore
 
 [Koin](https://insert-koin.io/) - Dependency injection
 
-[Voyager](https://voyager.adriel.cafe/) - Navigation
-
 [Sketch](https://panpf.github.io/sketch/) - Image loading
 
 [ZoomImage](https://panpf.github.io/zoomimage/) - Image zooming
