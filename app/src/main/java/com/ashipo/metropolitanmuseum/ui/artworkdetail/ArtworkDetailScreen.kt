@@ -1,4 +1,4 @@
-package com.ashipo.metropolitanmuseum.ui.artwork
+package com.ashipo.metropolitanmuseum.ui.artworkdetail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -56,8 +56,8 @@ import com.github.panpf.sketch.state.ThumbnailMemoryCacheStateImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ArtworkScreenContent(
-    uiState: ArtworkScreenState,
+fun ArtworkDetailScreen(
+    uiState: ArtworkDetailScreenState,
     onNavigateBack: () -> Unit,
     onShowFullscreen: (imageIndex: Int) -> Unit,
     modifier: Modifier = Modifier,
@@ -254,8 +254,8 @@ private fun Images(
     showSystemUi = true,
 )
 @Composable
-private fun ArtworkScreenPreview() {
-    val uiState = ArtworkScreenState(
+private fun ArtworkDetailScreenPreview() {
+    val uiState = ArtworkDetailScreenState(
         id = 12345,
         title = "Great Pyramid of Giza",
         constituents = listOf(
@@ -271,5 +271,5 @@ private fun ArtworkScreenPreview() {
             ArtworkImage("o3", "l3", "p3"),
         ),
     )
-    ArtworkScreenContent(uiState, {}, {})
+    ArtworkDetailScreen(uiState, {}, {})
 }

@@ -5,8 +5,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.ashipo.metropolitanmuseum.ui.artwork.navigation.artworkScreen
-import com.ashipo.metropolitanmuseum.ui.artwork.navigation.navigateToArtwork
+import com.ashipo.metropolitanmuseum.ui.artworkdetail.navigation.artworkDetailScreen
+import com.ashipo.metropolitanmuseum.ui.artworkdetail.navigation.navigateToArtworkDetail
 import com.ashipo.metropolitanmuseum.ui.home.navigation.HomeRoute
 import com.ashipo.metropolitanmuseum.ui.home.navigation.homeScreen
 import com.ashipo.metropolitanmuseum.ui.imageviewer.navigation.imageViewerScreen
@@ -29,9 +29,9 @@ fun AppNavigation(
         )
         searchResultScreen(
             onNavigateUp = navController::navigateUp,
-            onShowArtwork = navController::navigateToArtwork,
+            onShowArtwork = navController::navigateToArtworkDetail,
         )
-        artworkScreen(
+        artworkDetailScreen(
             onNavigateUp = navController::navigateUp,
             onShowFullscreen = navController::navigateToImageViewer,
         )

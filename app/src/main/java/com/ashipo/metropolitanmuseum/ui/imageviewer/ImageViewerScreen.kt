@@ -38,7 +38,7 @@ import com.github.panpf.zoomimage.rememberSketchZoomState
 import com.github.panpf.zoomimage.zoom.FixedScalesCalculator
 
 @Composable
-fun ImageViewerScreenContent(
+fun ImageViewerScreen(
     images: List<ArtworkImage>,
     initialImageIndex: Int,
     onNavigateBack: () -> Unit,

@@ -6,7 +6,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.ashipo.metropolitanmuseum.ui.imageviewer.ImageViewerScreenContent
+import com.ashipo.metropolitanmuseum.ui.imageviewer.ImageViewerScreen
 import com.ashipo.metropolitanmuseum.ui.model.ImageViewerParams
 import kotlinx.serialization.Serializable
 import kotlin.reflect.typeOf
@@ -35,7 +35,7 @@ fun ImageViewerRoute(
     onNavigateUp: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    ImageViewerScreenContent(
+    ImageViewerScreen(
         images = params.images,
         initialImageIndex = params.initialImageIndex,
         onNavigateBack = onNavigateUp,

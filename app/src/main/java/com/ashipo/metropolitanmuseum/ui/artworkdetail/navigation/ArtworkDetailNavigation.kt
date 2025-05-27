@@ -1,4 +1,4 @@
-package com.ashipo.metropolitanmuseum.ui.artwork.navigation
+package com.ashipo.metropolitanmuseum.ui.artworkdetail.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -6,39 +6,39 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.ashipo.metropolitanmuseum.data.network.model.Artwork
-import com.ashipo.metropolitanmuseum.ui.artwork.ArtworkScreenContent
-import com.ashipo.metropolitanmuseum.ui.artwork.ArtworkViewModel
+import com.ashipo.metropolitanmuseum.ui.artworkdetail.ArtworkDetailScreen
+import com.ashipo.metropolitanmuseum.ui.artworkdetail.ArtworkDetailViewModel
 import com.ashipo.metropolitanmuseum.ui.model.ImageViewerParams
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
 import kotlin.reflect.typeOf
 
 @Serializable
-data class ArtworkRoute(val artwork: Artwork)
+data class ArtworkDetailRoute(val artwork: Artwork)
 
-fun NavController.navigateToArtwork(artwork: Artwork) {
-    navigate(ArtworkRoute(artwork))
+fun NavController.navigateToArtworkDetail(artwork: Artwork) {
+    navigate(ArtworkDetailRoute(artwork))
 }
 
-fun NavGraphBuilder.artworkScreen(
+fun NavGraphBuilder.artworkDetailScreen(
     onShowFullscreen: (ImageViewerParams) -> Unit,
     onNavigateUp: () -> Unit,
 ) {
-    composable<ArtworkRoute>(
+    composable<ArtworkDetailRoute>(
         typeMap = mapOf(typeOf<Artwork>() to ArtworkType)
     ) {
-        ArtworkRoute(onShowFullscreen, onNavigateUp)
+        ArtworkDetailRoute(onShowFullscreen, onNavigateUp)
     }
 }
 
 @Composable
-fun ArtworkRoute(
+fun ArtworkDetailRoute(
     onShowFullscreen: (ImageViewerParams) -> Unit,
     onNavigateUp: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ArtworkViewModel = koinViewModel(),
+    viewModel: ArtworkDetailViewModel = koinViewModel(),
 ) {
-    ArtworkScreenContent(
+    ArtworkDetailScreen(
         uiState = viewModel.uiState,
         onNavigateBack = onNavigateUp,
         onShowFullscreen = { imageIndex ->

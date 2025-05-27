@@ -1,4 +1,4 @@
-package com.ashipo.metropolitanmuseum.ui.artwork
+package com.ashipo.metropolitanmuseum.ui.artworkdetail
 
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -12,7 +12,7 @@ import junit.framework.TestCase.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
-class ArtworkScreenContentTest {
+class ArtworkDetailScreenTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -21,8 +21,8 @@ class ArtworkScreenContentTest {
     fun backButton_onClick_navigatesBack() {
         var actual = false
         composeTestRule.setContent {
-            ArtworkScreenContent(
-                ArtworkScreenState(),
+            ArtworkDetailScreen(
+                ArtworkDetailScreenState(),
                 { actual = true },
                 {},
             )
@@ -36,7 +36,7 @@ class ArtworkScreenContentTest {
     @Test
     fun artworkInfo_isDisplayed() {
         // Tags are not displayed currently
-        val state = ArtworkScreenState(
+        val state = ArtworkDetailScreenState(
             title = "Chewbacca's bowcaster",
             constituents = listOf(
                 ConstituentInfo("The Emperor", "Palpatine"),
@@ -52,7 +52,7 @@ class ArtworkScreenContentTest {
         )
 
         composeTestRule.setContent {
-            ArtworkScreenContent(state, {}, {})
+            ArtworkDetailScreen(state, {}, {})
         }
 
         composeTestRule.apply {
@@ -82,8 +82,8 @@ class ArtworkScreenContentTest {
         }
 
         composeTestRule.setContent {
-            ArtworkScreenContent(
-                ArtworkScreenState(images = images), {}, {})
+            ArtworkDetailScreen(
+                ArtworkDetailScreenState(images = images), {}, {})
         }
 
         composeTestRule.apply {
@@ -108,8 +108,8 @@ class ArtworkScreenContentTest {
         val expectedIndex = images.lastIndex
         var actualIndex: Int? = null
         composeTestRule.setContent {
-            ArtworkScreenContent(
-                ArtworkScreenState(images = images), {}, { actualIndex = it })
+            ArtworkDetailScreen(
+                ArtworkDetailScreenState(images = images), {}, { actualIndex = it })
         }
 
         composeTestRule.apply {

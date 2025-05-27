@@ -6,7 +6,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.ashipo.metropolitanmuseum.ui.home.HomeScreenAction
-import com.ashipo.metropolitanmuseum.ui.home.HomeScreenContent
+import com.ashipo.metropolitanmuseum.ui.home.HomeScreen
 import com.ashipo.metropolitanmuseum.ui.home.HomeViewModel
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel
@@ -29,7 +29,7 @@ fun HomeRoute(
 ) {
     val departments by viewModel.departments.collectAsStateWithLifecycle()
     val searchPrefs by viewModel.searchPrefs.collectAsStateWithLifecycle()
-    HomeScreenContent(
+    HomeScreen(
         departments = departments,
         searchPrefs = searchPrefs,
         onAction = { action ->

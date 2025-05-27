@@ -17,7 +17,7 @@ import junit.framework.TestCase.assertEquals
 import org.junit.Rule
 import org.junit.Test
 
-class HomeScreenContentTest {
+class HomeScreenTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -27,7 +27,7 @@ class HomeScreenContentTest {
     @Test
     fun byTitle_isBackedBySearchPrefs() {
         composeTestRule.setContent {
-            HomeScreenContent(
+            HomeScreen(
                 departments = emptyList(),
                 searchPrefs = searchPrefs { byTitle = true },
                 onAction = {},
@@ -41,7 +41,7 @@ class HomeScreenContentTest {
     fun byTitle_onClick_updatesByTitle() {
         var performedAction: HomeScreenAction? = null
         composeTestRule.setContent {
-            HomeScreenContent(
+            HomeScreen(
                 departments = emptyList(),
                 searchPrefs = searchPrefs {},
                 onAction = { performedAction = it },
@@ -61,7 +61,7 @@ class HomeScreenContentTest {
     @Test
     fun byArtistOrCulture_isBackedBySearchPrefs() {
         composeTestRule.setContent {
-            HomeScreenContent(
+            HomeScreen(
                 departments = emptyList(),
                 searchPrefs = searchPrefs { byArtistOrCulture = true },
                 onAction = {},
@@ -75,7 +75,7 @@ class HomeScreenContentTest {
     fun byArtistOrCulture_onClick_updatesByArtistOrCulture() {
         var performedAction: HomeScreenAction? = null
         composeTestRule.setContent {
-            HomeScreenContent(
+            HomeScreen(
                 departments = emptyList(),
                 searchPrefs = searchPrefs {},
                 onAction = { performedAction = it },
@@ -95,7 +95,7 @@ class HomeScreenContentTest {
     @Test
     fun byTags_isBackedBySearchPrefs() {
         composeTestRule.setContent {
-            HomeScreenContent(
+            HomeScreen(
                 departments = emptyList(),
                 searchPrefs = searchPrefs { byTags = true },
                 onAction = {},
@@ -109,7 +109,7 @@ class HomeScreenContentTest {
     fun byTags_onClick_updatesByTags() {
         var performedAction: HomeScreenAction? = null
         composeTestRule.setContent {
-            HomeScreenContent(
+            HomeScreen(
                 departments = emptyList(),
                 searchPrefs = searchPrefs {},
                 onAction = { performedAction = it },
@@ -129,7 +129,7 @@ class HomeScreenContentTest {
     @Test
     fun withImage_isBackedBySearchPrefs() {
         composeTestRule.setContent {
-            HomeScreenContent(
+            HomeScreen(
                 departments = emptyList(),
                 searchPrefs = searchPrefs { withImage = true },
                 onAction = {},
@@ -143,7 +143,7 @@ class HomeScreenContentTest {
     fun withImage_onClick_updatesWithImage() {
         var performedAction: HomeScreenAction? = null
         composeTestRule.setContent {
-            HomeScreenContent(
+            HomeScreen(
                 departments = emptyList(),
                 searchPrefs = searchPrefs {},
                 onAction = { performedAction = it },
@@ -163,7 +163,7 @@ class HomeScreenContentTest {
     @Test
     fun isHighlight_isBackedBySearchPrefs() {
         composeTestRule.setContent {
-            HomeScreenContent(
+            HomeScreen(
                 departments = emptyList(),
                 searchPrefs = searchPrefs { isHighlight = true },
                 onAction = {},
@@ -177,7 +177,7 @@ class HomeScreenContentTest {
     fun isHighlight_onClick_updatesIsHighlight() {
         var performedAction: HomeScreenAction? = null
         composeTestRule.setContent {
-            HomeScreenContent(
+            HomeScreen(
                 departments = emptyList(),
                 searchPrefs = searchPrefs {},
                 onAction = { performedAction = it },
@@ -202,7 +202,7 @@ class HomeScreenContentTest {
             department { id = 3; name = "European" },
         )
         composeTestRule.setContent {
-            HomeScreenContent(
+            HomeScreen(
                 departments = departments,
                 searchPrefs = searchPrefs { departmentId = 2 },
                 onAction = {},
@@ -215,7 +215,7 @@ class HomeScreenContentTest {
     @Test
     fun department_onClick_showsDepartmentSelectDialog() {
         composeTestRule.setContent {
-            HomeScreenContent(
+            HomeScreen(
                 departments = emptyList(),
                 searchPrefs = searchPrefs {},
                 onAction = {},
@@ -242,7 +242,7 @@ class HomeScreenContentTest {
             department { id = 3; name = "European" },
         )
         composeTestRule.setContent {
-            HomeScreenContent(
+            HomeScreen(
                 departments = departments,
                 searchPrefs = searchPrefs {},
                 onAction = { performedAction = it },
@@ -271,7 +271,7 @@ class HomeScreenContentTest {
     @Test
     fun byDate_isBackedBySearchPrefs() {
         composeTestRule.setContent {
-            HomeScreenContent(
+            HomeScreen(
                 departments = emptyList(),
                 searchPrefs = searchPrefs { byDate = true },
                 onAction = {},
@@ -285,7 +285,7 @@ class HomeScreenContentTest {
     @Test
     fun byDate_onClick_showsPeriodSelectDialog() {
         composeTestRule.setContent {
-            HomeScreenContent(
+            HomeScreen(
                 departments = emptyList(),
                 searchPrefs = searchPrefs {},
                 onAction = {},
@@ -307,7 +307,7 @@ class HomeScreenContentTest {
         val expected = 168
 
         composeTestRule.setContent {
-            HomeScreenContent(
+            HomeScreen(
                 departments = emptyList(),
                 searchPrefs = searchPrefs { fromYear = expected },
                 onAction = {},
@@ -323,7 +323,7 @@ class HomeScreenContentTest {
         val year = 789
         var performedAction: HomeScreenAction? = null
         composeTestRule.setContent {
-            HomeScreenContent(
+            HomeScreen(
                 departments = emptyList(),
                 searchPrefs = searchPrefs {
                     fromYear = 500
@@ -356,7 +356,7 @@ class HomeScreenContentTest {
         val expected = 1689
 
         composeTestRule.setContent {
-            HomeScreenContent(
+            HomeScreen(
                 departments = emptyList(),
                 searchPrefs = searchPrefs { toYear = expected },
                 onAction = {},
@@ -372,7 +372,7 @@ class HomeScreenContentTest {
         val year = 789
         var performedAction: HomeScreenAction? = null
         composeTestRule.setContent {
-            HomeScreenContent(
+            HomeScreen(
                 departments = emptyList(),
                 searchPrefs = searchPrefs {
                     fromYear = 500
@@ -404,7 +404,7 @@ class HomeScreenContentTest {
         val mediums = listOf("Glass", "Cement")
 
         composeTestRule.setContent {
-            HomeScreenContent(
+            HomeScreen(
                 departments = emptyList(),
                 searchPrefs = searchPrefs { medium.addAll(mediums) },
                 onAction = {},
@@ -423,7 +423,7 @@ class HomeScreenContentTest {
         val mediums = listOf("Glass", "Cement")
         var performedAction: HomeScreenAction? = null
         composeTestRule.setContent {
-            HomeScreenContent(
+            HomeScreen(
                 departments = emptyList(),
                 searchPrefs = searchPrefs { medium.addAll(mediums) },
                 onAction = { performedAction = it },
@@ -450,7 +450,7 @@ class HomeScreenContentTest {
         val locations = listOf("Island", "City")
 
         composeTestRule.setContent {
-            HomeScreenContent(
+            HomeScreen(
                 departments = emptyList(),
                 searchPrefs = searchPrefs { geoLocation.addAll(locations) },
                 onAction = {},
@@ -469,7 +469,7 @@ class HomeScreenContentTest {
         val locations = listOf("Island", "City")
         var performedAction: HomeScreenAction? = null
         composeTestRule.setContent {
-            HomeScreenContent(
+            HomeScreen(
                 departments = emptyList(),
                 searchPrefs = searchPrefs { geoLocation.addAll(locations) },
                 onAction = { performedAction = it },
@@ -495,7 +495,7 @@ class HomeScreenContentTest {
     fun searchButton_onClick_executesSearchAction() {
         var performedAction: HomeScreenAction? = null
         composeTestRule.setContent {
-            HomeScreenContent(
+            HomeScreen(
                 departments = emptyList(),
                 searchPrefs = searchPrefs {},
                 onAction = { performedAction = it },

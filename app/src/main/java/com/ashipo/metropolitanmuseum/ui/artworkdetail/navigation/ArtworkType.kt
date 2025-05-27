@@ -1,4 +1,4 @@
-package com.ashipo.metropolitanmuseum.ui.artwork.navigation
+package com.ashipo.metropolitanmuseum.ui.artworkdetail.navigation
 
 import android.net.Uri
 import androidx.navigation.NavType

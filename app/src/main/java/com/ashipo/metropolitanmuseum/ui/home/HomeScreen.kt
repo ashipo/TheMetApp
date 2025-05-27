@@ -55,7 +55,7 @@ import com.ashipo.metropolitanmuseum.ui.util.SEARCH_MAX_LENGTH
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreenContent(
+fun HomeScreen(
     departments: List<Department>,
     searchPrefs: SearchPrefs,
     onAction: (HomeScreenAction) -> Unit,
@@ -203,7 +203,7 @@ private val optionModifier = Modifier.fillMaxWidth()
 @Preview
 @Composable
 private fun HomeScreenPreview() {
-    HomeScreenContent(
+    HomeScreen(
         departments = buildList {
             repeat(10) { i ->
                 add(department { id = i; name = "Department $i" })

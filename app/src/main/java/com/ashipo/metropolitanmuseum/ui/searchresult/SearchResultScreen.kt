@@ -83,7 +83,7 @@ import com.github.panpf.sketch.request.LoadState as SketchLoadState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchResultScreenContent(
+fun SearchResultScreen(
     uiState: SearchResultUiState,
     pagingArtworks: LazyPagingItems<ArtworkResult>,
     onAction: (SearchResultScreenAction) -> Unit,
@@ -550,7 +550,7 @@ private fun NotFoundPlaceholderPreview() {
 private fun ErrorScreenPreview() {
     val items: List<ArtworkResult> = emptyList()
     val pagingItems = MutableStateFlow(PagingData.from(items)).collectAsLazyPagingItems()
-    SearchResultScreenContent(
+    SearchResultScreen(
         uiState = SearchResultUiState.Error,
         pagingArtworks = pagingItems,
         onAction = {},
@@ -562,7 +562,7 @@ private fun ErrorScreenPreview() {
 private fun LoadingScreenPreview() {
     val items: List<ArtworkResult> = emptyList()
     val pagingItems = MutableStateFlow(PagingData.from(items)).collectAsLazyPagingItems()
-    SearchResultScreenContent(
+    SearchResultScreen(
         uiState = SearchResultUiState.Loading,
         pagingArtworks = pagingItems,
         onAction = {},
@@ -576,7 +576,7 @@ private fun SuccessScreenPreview() {
         Artwork(id = i, title = "Artwork №$i", culture = "Culture", date = "Date")
     }
     val pagingItems = MutableStateFlow(PagingData.from(items)).collectAsLazyPagingItems()
-    SearchResultScreenContent(
+    SearchResultScreen(
         uiState = SearchResultUiState.Success(items.size),
         pagingArtworks = pagingItems,
         onAction = {},

@@ -10,7 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ashipo.metropolitanmuseum.data.network.model.Artwork
 import com.ashipo.metropolitanmuseum.ui.searchresult.SearchResultScreenAction
-import com.ashipo.metropolitanmuseum.ui.searchresult.SearchResultScreenContent
+import com.ashipo.metropolitanmuseum.ui.searchresult.SearchResultScreen
 import com.ashipo.metropolitanmuseum.ui.searchresult.SearchResultViewModel
 import com.ashipo.metropolitanmuseum.ui.util.openUrl
 import kotlinx.serialization.Serializable
@@ -42,7 +42,7 @@ fun SearchResultRoute(
     val uiState = viewModel.uiState.collectAsStateWithLifecycle().value
     val pagingArtworks = viewModel.pagingArtworks.collectAsLazyPagingItems()
     val context = LocalContext.current
-    SearchResultScreenContent(
+    SearchResultScreen(
         uiState = uiState,
         pagingArtworks = pagingArtworks,
         onAction = { action ->

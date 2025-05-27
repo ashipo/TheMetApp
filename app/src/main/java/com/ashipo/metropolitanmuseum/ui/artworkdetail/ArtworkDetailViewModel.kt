@@ -1,4 +1,4 @@
-package com.ashipo.metropolitanmuseum.ui.artwork
+package com.ashipo.metropolitanmuseum.ui.artworkdetail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -6,20 +6,20 @@ import androidx.navigation.toRoute
 import com.ashipo.metropolitanmuseum.data.getLargeImageUrl
 import com.ashipo.metropolitanmuseum.data.getPreviewImageUrl
 import com.ashipo.metropolitanmuseum.data.network.model.Artwork
-import com.ashipo.metropolitanmuseum.ui.artwork.navigation.ArtworkRoute
-import com.ashipo.metropolitanmuseum.ui.artwork.navigation.ArtworkType
+import com.ashipo.metropolitanmuseum.ui.artworkdetail.navigation.ArtworkDetailRoute
+import com.ashipo.metropolitanmuseum.ui.artworkdetail.navigation.ArtworkType
 import com.ashipo.metropolitanmuseum.ui.model.ArtworkImage
 import kotlin.reflect.typeOf
 
-class ArtworkViewModel(
+class ArtworkDetailViewModel(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val artwork: Artwork = savedStateHandle.toRoute<ArtworkRoute>(
+    private val artwork: Artwork = savedStateHandle.toRoute<ArtworkDetailRoute>(
         typeMap = mapOf(typeOf<Artwork>() to ArtworkType)
     ).artwork
 
-    val uiState: ArtworkScreenState = ArtworkScreenState(
+    val uiState: ArtworkDetailScreenState = ArtworkDetailScreenState(
         id = artwork.id,
         title = getTitle(artwork),
         constituents = getConstituents(artwork),
@@ -109,7 +109,7 @@ private fun getGeography(artwork: Artwork): String {
 private fun getTags(artwork: Artwork) =
     artwork.tags?.map { it.term } ?: emptyList()
 
-data class ArtworkScreenState(
+data class ArtworkDetailScreenState(
     val id: Int = 0,
     val title: String = "",
     val constituents: List<ConstituentInfo> = emptyList(),
