@@ -1,8 +1,7 @@
 package com.ashipo.metropolitanmuseum.data.network.model
 
-import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
-import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 /**
  * @param id Identifying number for each artwork (unique, can be used as key field)
@@ -28,7 +27,7 @@ import kotlinx.parcelize.Parcelize
  * @param additionalImagesUrls URLs to the additional images
  * @param objectPageUrl URL to object's page on metmuseum.org
  */
-@Parcelize
+@Serializable
 data class Artwork(
     @SerializedName("objectID")
     override val id: Int,
@@ -73,7 +72,7 @@ data class Artwork(
     val additionalImagesUrls: List<String>? = null,
     @SerializedName("objectURL")
     val objectPageUrl: String = "",
-) : ArtworkResult, Parcelable
+) : ArtworkResult
 
 sealed interface ArtworkResult {
 
@@ -82,16 +81,16 @@ sealed interface ArtworkResult {
     data class NotFound(override val id: Int) : ArtworkResult
 }
 
-@Parcelize
+@Serializable
 data class Tag(
     val term: String,
     @SerializedName("AAT_URL")
     val aatUrl: String,
     @SerializedName("Wikidata_URL")
     val wikidataUrl: String,
-) : Parcelable
+)
 
-@Parcelize
+@Serializable
 data class Constituent(
     @SerializedName("constituentID")
     val id: Int,
@@ -102,4 +101,4 @@ data class Constituent(
     @SerializedName("constituentWikidata_URL")
     val wikidataUrl: String,
     val gender: String,
-) : Parcelable
+)

@@ -16,7 +16,7 @@ import junit.framework.TestCase.assertEquals
 import org.junit.Rule
 import org.junit.Test
 
-class SearchResultScreenContentTest {
+class SearchResultScreenTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -39,7 +39,7 @@ class SearchResultScreenContentTest {
         var actual: SearchResultScreenAction? = null
         composeTestRule.setContent {
             val items = items.collectAsLazyPagingItems()
-            SearchResultScreenContent(
+            SearchResultScreen(
                 SearchResultUiState.Error,
                 pagingArtworks = items,
                 onAction = { actual = it },
@@ -57,7 +57,7 @@ class SearchResultScreenContentTest {
         var actual: SearchResultScreenAction? = null
         composeTestRule.setContent {
             val items = items.collectAsLazyPagingItems()
-            SearchResultScreenContent(
+            SearchResultScreen(
                 SearchResultUiState.Success(artworks.size),
                 pagingArtworks = items,
                 onAction = { actual = it },
@@ -78,7 +78,7 @@ class SearchResultScreenContentTest {
         var actual: SearchResultScreenAction? = null
         composeTestRule.setContent {
             val items = items.collectAsLazyPagingItems()
-            SearchResultScreenContent(
+            SearchResultScreen(
                 SearchResultUiState.Success(artworks.size),
                 pagingArtworks = items,
                 onAction = { actual = it },
@@ -97,7 +97,7 @@ class SearchResultScreenContentTest {
     fun artworks_displayTitle() {
         composeTestRule.setContent {
             val items = items.collectAsLazyPagingItems()
-            SearchResultScreenContent(
+            SearchResultScreen(
                 uiState = SearchResultUiState.Success(artworks.size),
                 pagingArtworks = items,
                 onAction = {},

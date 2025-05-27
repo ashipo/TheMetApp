@@ -1,7 +1,7 @@
 package com.ashipo.metropolitanmuseum.ui.home
 
-import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.screenModelScope
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.ashipo.metropolitanmuseum.SearchPrefs
 import com.ashipo.metropolitanmuseum.data.DepartmentRepository
 import com.ashipo.metropolitanmuseum.data.SearchPrefsRepository
@@ -9,26 +9,26 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class HomeScreenModel(
+class HomeViewModel(
     departmentRepository: DepartmentRepository,
     private val searchPrefsRepository: SearchPrefsRepository,
-) : ScreenModel {
+) : ViewModel() {
 
     val departments = departmentRepository.departments
         .stateIn(
-            scope = screenModelScope,
+            scope = viewModelScope,
             initialValue = emptyList(),
             started = SharingStarted.WhileSubscribed(5_000),
         )
 
     val searchPrefs = searchPrefsRepository.searchPrefs
         .stateIn(
-            scope = screenModelScope,
+            scope = viewModelScope,
             initialValue = SearchPrefs.getDefaultInstance(),
             started = SharingStarted.WhileSubscribed(5_000),
         )
 
-    fun onAction(action: HomeScreenAction) = screenModelScope.launch {
+    fun onAction(action: HomeScreenAction) = viewModelScope.launch {
         when (action) {
             is HomeScreenAction.SetByTitle ->
                 searchPrefsRepository.setByTitle(action.value)
