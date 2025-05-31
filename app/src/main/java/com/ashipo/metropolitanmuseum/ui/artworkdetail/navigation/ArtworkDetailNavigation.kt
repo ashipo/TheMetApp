@@ -1,11 +1,13 @@
 package com.ashipo.metropolitanmuseum.ui.artworkdetail.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.ashipo.metropolitanmuseum.data.network.model.Artwork
+import com.ashipo.metropolitanmuseum.ui.LocalAnimatedVisibilityScope
 import com.ashipo.metropolitanmuseum.ui.artworkdetail.ArtworkDetailScreen
 import com.ashipo.metropolitanmuseum.ui.artworkdetail.ArtworkDetailViewModel
 import com.ashipo.metropolitanmuseum.ui.model.ImageViewerParams
@@ -27,7 +29,11 @@ fun NavGraphBuilder.artworkDetailScreen(
     composable<ArtworkDetailRoute>(
         typeMap = mapOf(typeOf<Artwork>() to ArtworkType)
     ) {
-        ArtworkDetailRoute(onShowFullscreen, onNavigateUp)
+        CompositionLocalProvider(
+            LocalAnimatedVisibilityScope provides this@composable,
+        ) {
+            ArtworkDetailRoute(onShowFullscreen, onNavigateUp)
+        }
     }
 }
 

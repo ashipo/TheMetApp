@@ -1,5 +1,9 @@
+@file:OptIn(ExperimentalSharedTransitionApi::class)
+
 package com.ashipo.metropolitanmuseum.ui.imageviewer
 
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope.ResizeMode.Companion.RemeasureToBounds
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,6 +31,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.ashipo.metropolitanmuseum.R
+import com.ashipo.metropolitanmuseum.ui.LocalAnimatedVisibilityScope
+import com.ashipo.metropolitanmuseum.ui.LocalSharedTransitionScope
 import com.ashipo.metropolitanmuseum.ui.model.ArtworkImage
 import com.github.panpf.sketch.rememberAsyncImageState
 import com.github.panpf.sketch.request.ComposableImageRequest
@@ -45,15 +51,27 @@ fun ImageViewerScreen(
     modifier: Modifier = Modifier,
 ) {
     Box(modifier) {
-        FilledTonalIconButton(
-            onClick = onNavigateBack,
-            modifier = Modifier
-                .zIndex(1f)
-                .align(Alignment.TopEnd)
-                .safeDrawingPadding()
-                .padding(8.dp)
-        ) {
-            Icon(Icons.Default.Close, stringResource(R.string.close))
+        val sharedTransitionScope = LocalSharedTransitionScope.current
+            ?: throw IllegalStateException("No Scope found")
+        val animatedVisibilityScope = LocalAnimatedVisibilityScope.current
+            ?: throw IllegalStateException("No Scope found")
+        with(sharedTransitionScope) {
+            with(animatedVisibilityScope) {
+                FilledTonalIconButton(
+                    onClick = onNavigateBack,
+                    modifier = Modifier
+                        .zIndex(1f)
+                        .align(Alignment.TopEnd)
+                        .safeDrawingPadding()
+                        .padding(8.dp)
+                        .renderInSharedTransitionScopeOverlay(
+                            zIndexInOverlay = 1f
+                        )
+                        .animateEnterExit()
+                ) {
+                    Icon(Icons.Default.Close, stringResource(R.string.close))
+                }
+            }
         }
 
         val pagerState = rememberPagerState(initialImageIndex) { images.size }
@@ -64,8 +82,6 @@ fun ImageViewerScreen(
         ) { index ->
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .fillMaxSize()
             ) {
                 val imageState = rememberAsyncImageState()
                 val zoomState = rememberSketchZoomState()
@@ -84,21 +100,28 @@ fun ImageViewerScreen(
                     val sketch = context.sketch
                     val memoryCache = sketch.memoryCache
                     memoryCache.withLock(images[index].largeUrl) {
-                        // TODO: Refactor this hack (ask author for a better way?)
+                        // TODO: Refactor this hack (ask Sketch dev for a better way?)
                         isPlaceholderCached = keys().any { it.startsWith(images[index].largeUrl) }
                     }
                 }
 
-                SketchZoomAsyncImage(
-                    request = request,
-                    state = imageState,
-                    zoomState = zoomState,
-                    contentDescription = stringResource(R.string.artwork_image_template)
-                        .format(index + 1),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .zIndex(1f)
-                )
+                with(sharedTransitionScope) {
+                    SketchZoomAsyncImage(
+                        request = request,
+                        state = imageState,
+                        zoomState = zoomState,
+                        contentDescription = stringResource(R.string.artwork_image_template)
+                            .format(index + 1),
+                        modifier = Modifier
+                            .zIndex(1f)
+                            .sharedBounds(
+                                rememberSharedContentState("Image$index"),
+                                animatedVisibilityScope,
+                                resizeMode = RemeasureToBounds,
+                            )
+                            .fillMaxSize()
+                    )
+                }
 
                 when (imageState.loadState) {
                     is LoadState.Started -> {
