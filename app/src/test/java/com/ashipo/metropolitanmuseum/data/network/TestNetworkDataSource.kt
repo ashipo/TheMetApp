@@ -1,6 +1,6 @@
 package com.ashipo.metropolitanmuseum.data.network
 
-import com.ashipo.metropolitanmuseum.data.network.model.ArtworkResult
+import com.ashipo.metropolitanmuseum.data.network.model.ArtworkRequestResult
 import com.ashipo.metropolitanmuseum.data.network.model.NetworkDepartments
 import com.ashipo.metropolitanmuseum.data.network.model.SearchResult
 
@@ -8,7 +8,7 @@ class TestNetworkDataSource : NetworkDataSource {
 
     private var departments: NetworkDepartments = NetworkDepartments(emptyList())
     private var searchResult: SearchResult = SearchResult(0, emptyList())
-    private val artworks = mutableMapOf<Int, ArtworkResult>()
+    private val artworks = mutableMapOf<Int, ArtworkRequestResult>()
 
     private var searchOptions = mapOf<String, String>()
 
@@ -22,12 +22,12 @@ class TestNetworkDataSource : NetworkDataSource {
     }
 
     /**
-     * Returns [ArtworkResult] for the given [id] or throws if it was not added with
+     * Returns [ArtworkRequestResult] for the given [id] or throws if it was not added with
      * [addArtworkResult]
      *
      * @throws NoSuchElementException
      */
-    override suspend fun getArtwork(id: Int): ArtworkResult {
+    override suspend fun getArtwork(id: Int): ArtworkRequestResult {
         return artworks.getValue(id)
     }
 
@@ -41,8 +41,8 @@ class TestNetworkDataSource : NetworkDataSource {
         this.searchResult = searchResult
     }
 
-    fun addArtworkResult(artworkResult: ArtworkResult) {
-        artworks[artworkResult.id] = artworkResult
+    fun addArtworkResult(artworkRequestResult: ArtworkRequestResult) {
+        artworks[artworkRequestResult.id] = artworkRequestResult
     }
 
     fun getSearchOptions(): Map<String, String> {

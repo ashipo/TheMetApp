@@ -72,8 +72,8 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.ashipo.metropolitanmuseum.R
-import com.ashipo.metropolitanmuseum.data.network.model.Artwork
-import com.ashipo.metropolitanmuseum.data.network.model.ArtworkResult
+import com.ashipo.metropolitanmuseum.data.network.model.NetworkArtwork
+import com.ashipo.metropolitanmuseum.data.network.model.ArtworkRequestResult
 import com.ashipo.metropolitanmuseum.ui.util.openUrl
 import com.github.panpf.sketch.AsyncImage
 import com.github.panpf.sketch.rememberAsyncImageState
@@ -85,7 +85,7 @@ import com.github.panpf.sketch.request.LoadState as SketchLoadState
 @Composable
 fun SearchResultScreen(
     uiState: SearchResultUiState,
-    pagingArtworks: LazyPagingItems<ArtworkResult>,
+    pagingArtworks: LazyPagingItems<ArtworkRequestResult>,
     onAction: (SearchResultScreenAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -148,7 +148,7 @@ fun SearchResultScreen(
                     Column {
                         pagingArtworks[index]?.let { artworkResult ->
                             when (artworkResult) {
-                                is Artwork -> Artwork(
+                                is NetworkArtwork -> Artwork(
                                     artwork = artworkResult,
                                     onShowArtwork = {
                                         onAction(SearchResultScreenAction.ShowArtwork(artworkResult))
@@ -159,7 +159,7 @@ fun SearchResultScreen(
                                     modifier = Modifier.fillMaxWidth()
                                 )
 
-                                is ArtworkResult.NotFound -> NotFoundPlaceholder(
+                                is ArtworkRequestResult.NotFound -> NotFoundPlaceholder(
                                     artworkResult.id,
                                     Modifier.fillMaxWidth()
                                 )
@@ -217,7 +217,7 @@ private val artworkSize = Modifier
 
 @Composable
 private fun Artwork(
-    artwork: Artwork,
+    artwork: NetworkArtwork,
     onShowArtwork: () -> Unit,
     onOpenWebpage: () -> Unit,
     modifier: Modifier = Modifier,
@@ -391,7 +391,7 @@ private val previewSize = Modifier
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ArtworkPreview(
-    artwork: Artwork,
+    artwork: NetworkArtwork,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -501,7 +501,7 @@ private fun ArtworkPreview(
     previewUrl: String = "",
     objectPageUrl: String = "https://www.metmuseum.org/art/collection/search/753523",
 ) {
-    val artwork = Artwork(
+    val artwork = NetworkArtwork(
         id = id,
         isHighlight = isHighlight,
         isPublicDomain = isPublicDomain,
@@ -548,7 +548,7 @@ private fun NotFoundPlaceholderPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun ErrorScreenPreview() {
-    val items: List<ArtworkResult> = emptyList()
+    val items: List<ArtworkRequestResult> = emptyList()
     val pagingItems = MutableStateFlow(PagingData.from(items)).collectAsLazyPagingItems()
     SearchResultScreen(
         uiState = SearchResultUiState.Error,
@@ -560,7 +560,7 @@ private fun ErrorScreenPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun LoadingScreenPreview() {
-    val items: List<ArtworkResult> = emptyList()
+    val items: List<ArtworkRequestResult> = emptyList()
     val pagingItems = MutableStateFlow(PagingData.from(items)).collectAsLazyPagingItems()
     SearchResultScreen(
         uiState = SearchResultUiState.Loading,
@@ -572,8 +572,8 @@ private fun LoadingScreenPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun SuccessScreenPreview() {
-    val items: List<ArtworkResult> = List(20) { i ->
-        Artwork(id = i, title = "Artwork №$i", culture = "Culture", date = "Date")
+    val items: List<ArtworkRequestResult> = List(20) { i ->
+        NetworkArtwork(id = i, title = "Artwork №$i", culture = "Culture", date = "Date")
     }
     val pagingItems = MutableStateFlow(PagingData.from(items)).collectAsLazyPagingItems()
     SearchResultScreen(

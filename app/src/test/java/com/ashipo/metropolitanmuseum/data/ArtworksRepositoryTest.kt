@@ -1,7 +1,7 @@
 package com.ashipo.metropolitanmuseum.data
 
-import com.ashipo.metropolitanmuseum.data.network.model.Artwork
-import com.ashipo.metropolitanmuseum.data.network.model.ArtworkResult
+import com.ashipo.metropolitanmuseum.data.network.model.NetworkArtwork
+import com.ashipo.metropolitanmuseum.data.network.model.ArtworkRequestResult
 import com.ashipo.metropolitanmuseum.data.network.TestNetworkDataSource
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.BeforeEach
@@ -23,14 +23,14 @@ class ArtworksRepositoryTest {
 
     @Test
     fun `getArtworks is backed by NetworkDataSource`() = runTest {
-        val artwork = Artwork(id = 1)
-        val notFound = ArtworkResult.NotFound(id = 2)
+        val artwork = NetworkArtwork(id = 1)
+        val notFound = ArtworkRequestResult.NotFound(id = 2)
         dataSource.addArtworkResult(artwork)
         dataSource.addArtworkResult(notFound)
 
         val actual = subject.getArtworks(listOf(1, 2))
 
         assertContains(actual, artwork)
-        assertContains(actual, ArtworkResult.NotFound(2))
+        assertContains(actual, ArtworkRequestResult.NotFound(2))
     }
 }

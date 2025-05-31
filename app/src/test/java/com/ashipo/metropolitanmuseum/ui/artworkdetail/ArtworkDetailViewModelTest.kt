@@ -4,7 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.testing.invoke
 import com.ashipo.metropolitanmuseum.data.getLargeImageUrl
 import com.ashipo.metropolitanmuseum.data.getPreviewImageUrl
-import com.ashipo.metropolitanmuseum.data.network.model.Artwork
+import com.ashipo.metropolitanmuseum.data.network.model.NetworkArtwork
 import com.ashipo.metropolitanmuseum.data.network.model.Constituent
 import com.ashipo.metropolitanmuseum.data.network.model.Tag
 import com.ashipo.metropolitanmuseum.ui.artworkdetail.navigation.ArtworkDetailRoute
@@ -20,12 +20,12 @@ import kotlin.test.assertTrue
 @RunWith(RobolectricTestRunner::class)
 class ArtworkDetailViewModelTest {
 
-    private val typeMap = mapOf(typeOf<Artwork>() to ArtworkType)
+    private val typeMap = mapOf(typeOf<NetworkArtwork>() to ArtworkType)
 
     @Test
     fun `uiState_id - backed up by Artwork_id`() {
         val expected = 123
-        val artwork = Artwork(
+        val artwork = NetworkArtwork(
             id = expected,
         )
 
@@ -38,7 +38,7 @@ class ArtworkDetailViewModelTest {
     @Test
     fun `uiState_title - when Artwork_title is not blank - same as Artwork_title`() {
         val expected = "Jaguar Whistling Jar"
-        val artwork = Artwork(
+        val artwork = NetworkArtwork(
             id = 1,
             title = expected,
         )
@@ -54,7 +54,7 @@ class ArtworkDetailViewModelTest {
     // Example id: 503542
     fun `uiState_title - when Artwork_title is blank - same as Artwork_objectName`() {
         val expected = "Jaguar Whistling Jar"
-        val artwork = Artwork(
+        val artwork = NetworkArtwork(
             id = 1,
             title = "",
             objectName = expected,
@@ -78,7 +78,7 @@ class ArtworkDetailViewModelTest {
                 gender = "",
             )
         }
-        val artwork = Artwork(
+        val artwork = NetworkArtwork(
             id = 1,
             constituents = constituents,
         )
@@ -98,7 +98,7 @@ class ArtworkDetailViewModelTest {
     @Test
     fun `uiState_period - backed up by Artwork_period`() {
         val expected = "Late 90's"
-        val artwork = Artwork(
+        val artwork = NetworkArtwork(
             id = 1,
             period = expected,
         )
@@ -112,7 +112,7 @@ class ArtworkDetailViewModelTest {
     @Test
     fun `uiState_date - backed up by Artwork_date`() {
         val expected = "Late 90's"
-        val artwork = Artwork(
+        val artwork = NetworkArtwork(
             id = 1,
             date = expected,
         )
@@ -125,7 +125,7 @@ class ArtworkDetailViewModelTest {
 
     @Test
     fun `uiState_geography - backed up by geography-related Artwork fields`() {
-        val artwork = Artwork(
+        val artwork = NetworkArtwork(
             id = 1,
             city = "Amsterdam",
             state = "Rajasthan",
@@ -157,7 +157,7 @@ class ArtworkDetailViewModelTest {
     @Test
     fun `uiState_culture - backed up by Artwork_culture`() {
         val expected = "Persian"
-        val artwork = Artwork(
+        val artwork = NetworkArtwork(
             id = 1,
             culture = expected,
         )
@@ -171,7 +171,7 @@ class ArtworkDetailViewModelTest {
     @Test
     fun `uiState_medium - backed up by Artwork_medium`() {
         val expected = "Wood"
-        val artwork = Artwork(
+        val artwork = NetworkArtwork(
             id = 1,
             medium = expected,
         )
@@ -185,7 +185,7 @@ class ArtworkDetailViewModelTest {
     @Test
     fun `uiState_classification - backed up by Artwork_classification`() {
         val expected = "Sculpture"
-        val artwork = Artwork(
+        val artwork = NetworkArtwork(
             id = 1,
             classification = expected,
         )
@@ -199,7 +199,7 @@ class ArtworkDetailViewModelTest {
     @Test
     fun `uiState_department - backed up by Artwork_department`() {
         val expected = "Egyptian Art"
-        val artwork = Artwork(
+        val artwork = NetworkArtwork(
             id = 1,
             department = expected,
         )
@@ -212,7 +212,7 @@ class ArtworkDetailViewModelTest {
 
     @Test
     fun `uiState_images - when Artwork_primaryImage is blank - is empty`() {
-        val artwork = Artwork(
+        val artwork = NetworkArtwork(
             id = 1,
             primaryImageUrl = "  ",
         )
@@ -233,7 +233,7 @@ class ArtworkDetailViewModelTest {
             "https://images.metmuseum.org/CRDImages/gr/original/DP-18928-002.jpg",
             "https://images.metmuseum.org/CRDImages/gr/original/DP-18928-003.jpg",
         )
-        val artwork = Artwork(
+        val artwork = NetworkArtwork(
             id = 1,
             primaryImageUrl = primaryImage,
             primaryImagePreviewUrl = primaryImagePreview,
@@ -265,7 +265,7 @@ class ArtworkDetailViewModelTest {
     }
 
     fun `uiState_tags - when Artwork_tags is null - is empty`() {
-        val artwork = Artwork(
+        val artwork = NetworkArtwork(
             id = 1,
             tags = null,
         )
@@ -282,7 +282,7 @@ class ArtworkDetailViewModelTest {
             Tag("Portrait", "www.aat.url/1", "www.wiki.url/1"),
             Tag("Painting", "www.aat.url/2", "www.wiki.url/2"),
         )
-        val artwork = Artwork(
+        val artwork = NetworkArtwork(
             id = 1,
             tags = tags,
         )

@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.navigation.toRoute
 import com.ashipo.metropolitanmuseum.data.getLargeImageUrl
 import com.ashipo.metropolitanmuseum.data.getPreviewImageUrl
-import com.ashipo.metropolitanmuseum.data.network.model.Artwork
+import com.ashipo.metropolitanmuseum.data.network.model.NetworkArtwork
 import com.ashipo.metropolitanmuseum.ui.artworkdetail.navigation.ArtworkDetailRoute
 import com.ashipo.metropolitanmuseum.ui.artworkdetail.navigation.ArtworkType
 import com.ashipo.metropolitanmuseum.ui.model.ArtworkImage
@@ -15,8 +15,8 @@ class ArtworkDetailViewModel(
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
-    private val artwork: Artwork = savedStateHandle.toRoute<ArtworkDetailRoute>(
-        typeMap = mapOf(typeOf<Artwork>() to ArtworkType)
+    private val artwork: NetworkArtwork = savedStateHandle.toRoute<ArtworkDetailRoute>(
+        typeMap = mapOf(typeOf<NetworkArtwork>() to ArtworkType)
     ).artwork
 
     val uiState: ArtworkDetailScreenState = ArtworkDetailScreenState(
@@ -35,30 +35,30 @@ class ArtworkDetailViewModel(
     )
 }
 
-private fun getTitle(artwork: Artwork) =
-    artwork.title.ifBlank {
-        artwork.objectName
+private fun getTitle(networkArtwork: NetworkArtwork) =
+    networkArtwork.title.ifBlank {
+        networkArtwork.objectName
     }
 
-private fun getConstituents(artwork: Artwork): List<ConstituentInfo> {
-    return artwork.constituents?.map {
+private fun getConstituents(networkArtwork: NetworkArtwork): List<ConstituentInfo> {
+    return networkArtwork.constituents?.map {
         ConstituentInfo(it.role, it.name)
     } ?: emptyList()
 }
 
-private fun getImages(artwork: Artwork): List<ArtworkImage> {
-    if (artwork.primaryImageUrl.isBlank()) {
+private fun getImages(networkArtwork: NetworkArtwork): List<ArtworkImage> {
+    if (networkArtwork.primaryImageUrl.isBlank()) {
         return emptyList()
     }
     val images = mutableListOf<ArtworkImage>()
-    val primaryLarge = getLargeImageUrl(artwork.primaryImageUrl)
-    val primaryPreview = artwork.primaryImagePreviewUrl
-    images.add(ArtworkImage(artwork.primaryImageUrl, primaryLarge, primaryPreview))
+    val primaryLarge = getLargeImageUrl(networkArtwork.primaryImageUrl)
+    val primaryPreview = networkArtwork.primaryImagePreviewUrl
+    images.add(ArtworkImage(networkArtwork.primaryImageUrl, primaryLarge, primaryPreview))
 
-    if (artwork.additionalImagesUrls.isNullOrEmpty()) {
+    if (networkArtwork.additionalImagesUrls.isNullOrEmpty()) {
         return images
     }
-    for (original in artwork.additionalImagesUrls) {
+    for (original in networkArtwork.additionalImagesUrls) {
         val preview = getPreviewImageUrl(original)
         val large = getLargeImageUrl(original)
         images.add(ArtworkImage(original, large, preview))
@@ -66,48 +66,48 @@ private fun getImages(artwork: Artwork): List<ArtworkImage> {
     return images
 }
 
-private fun getGeography(artwork: Artwork): String {
+private fun getGeography(networkArtwork: NetworkArtwork): String {
     val location = buildList {
-        if (artwork.city.isNotBlank()) {
-            add(artwork.city)
+        if (networkArtwork.city.isNotBlank()) {
+            add(networkArtwork.city)
         }
-        if (artwork.state.isNotBlank()) {
-            add(artwork.state)
+        if (networkArtwork.state.isNotBlank()) {
+            add(networkArtwork.state)
         }
-        if (artwork.county.isNotBlank()) {
-            add(artwork.county)
+        if (networkArtwork.county.isNotBlank()) {
+            add(networkArtwork.county)
         }
-        if (artwork.country.isNotBlank()) {
-            add(artwork.country)
+        if (networkArtwork.country.isNotBlank()) {
+            add(networkArtwork.country)
         }
-        if (artwork.region.isNotBlank()) {
-            add(artwork.region)
+        if (networkArtwork.region.isNotBlank()) {
+            add(networkArtwork.region)
         }
-        if (artwork.subregion.isNotBlank()) {
-            add(artwork.subregion)
+        if (networkArtwork.subregion.isNotBlank()) {
+            add(networkArtwork.subregion)
         }
-        if (artwork.locale.isNotBlank()) {
-            add(artwork.locale)
+        if (networkArtwork.locale.isNotBlank()) {
+            add(networkArtwork.locale)
         }
-        if (artwork.locus.isNotBlank()) {
-            add(artwork.locus)
+        if (networkArtwork.locus.isNotBlank()) {
+            add(networkArtwork.locus)
         }
-        if (artwork.excavation.isNotBlank()) {
-            add(artwork.excavation)
+        if (networkArtwork.excavation.isNotBlank()) {
+            add(networkArtwork.excavation)
         }
-        if (artwork.river.isNotBlank()) {
-            add(artwork.river)
+        if (networkArtwork.river.isNotBlank()) {
+            add(networkArtwork.river)
         }
     }.joinToString(", ")
-    return if (location.isBlank() || artwork.geographyType.isBlank()) {
+    return if (location.isBlank() || networkArtwork.geographyType.isBlank()) {
         location
     } else {
-        "${artwork.geographyType} $location"
+        "${networkArtwork.geographyType} $location"
     }
 }
 
-private fun getTags(artwork: Artwork) =
-    artwork.tags?.map { it.term } ?: emptyList()
+private fun getTags(networkArtwork: NetworkArtwork) =
+    networkArtwork.tags?.map { it.term } ?: emptyList()
 
 data class ArtworkDetailScreenState(
     val id: Int = 0,

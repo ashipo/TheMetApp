@@ -28,7 +28,7 @@ import kotlinx.serialization.Serializable
  * @param objectPageUrl URL to object's page on metmuseum.org
  */
 @Serializable
-data class Artwork(
+data class NetworkArtwork(
     @SerializedName("objectID")
     override val id: Int,
     val isHighlight: Boolean = false,
@@ -72,13 +72,13 @@ data class Artwork(
     val additionalImagesUrls: List<String>? = null,
     @SerializedName("objectURL")
     val objectPageUrl: String = "",
-) : ArtworkResult
+) : ArtworkRequestResult
 
-sealed interface ArtworkResult {
+sealed interface ArtworkRequestResult {
 
     val id: Int
 
-    data class NotFound(override val id: Int) : ArtworkResult
+    data class NotFound(override val id: Int) : ArtworkRequestResult
 }
 
 @Serializable

@@ -10,8 +10,8 @@ import androidx.paging.PagingConfig
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.testing.asPagingSourceFactory
 import com.ashipo.metropolitanmuseum.data.network.PAGE_SIZE
-import com.ashipo.metropolitanmuseum.data.network.model.Artwork
-import com.ashipo.metropolitanmuseum.data.network.model.ArtworkResult
+import com.ashipo.metropolitanmuseum.data.network.model.NetworkArtwork
+import com.ashipo.metropolitanmuseum.data.network.model.ArtworkRequestResult
 import junit.framework.TestCase.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -23,7 +23,7 @@ class SearchResultScreenTest {
 
     private val artworks = List(100) { i ->
         val id = i + 1000
-        Artwork(
+        NetworkArtwork(
             id = id,
             title = "Artwork #$id",
         )
@@ -31,7 +31,7 @@ class SearchResultScreenTest {
 
     private val items = Pager(
         config = PagingConfig(pageSize = PAGE_SIZE),
-        pagingSourceFactory = (artworks as List<ArtworkResult>).asPagingSourceFactory(),
+        pagingSourceFactory = (artworks as List<ArtworkRequestResult>).asPagingSourceFactory(),
     ).flow
 
     @Test

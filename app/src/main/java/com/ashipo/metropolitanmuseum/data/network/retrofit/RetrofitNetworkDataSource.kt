@@ -1,6 +1,6 @@
 package com.ashipo.metropolitanmuseum.data.network.retrofit
 
-import com.ashipo.metropolitanmuseum.data.network.model.ArtworkResult
+import com.ashipo.metropolitanmuseum.data.network.model.ArtworkRequestResult
 import com.ashipo.metropolitanmuseum.data.network.model.NetworkDepartments
 import com.ashipo.metropolitanmuseum.data.network.model.SearchResult
 import com.ashipo.metropolitanmuseum.data.network.NetworkDataSource
@@ -16,7 +16,7 @@ class RetrofitNetworkDataSource(
     override suspend fun search(options: Map<String, String>): SearchResult =
         museumApi.search(options)
 
-    override suspend fun getArtwork(id: Int): ArtworkResult {
+    override suspend fun getArtwork(id: Int): ArtworkRequestResult {
         return try {
             museumApi.getArtwork(id)
         } catch (e: HttpException) {
@@ -24,7 +24,7 @@ class RetrofitNetworkDataSource(
             // available through the public API.
             // Rethrow/ignore all the other exceptions.
             if (e.code() == 404) {
-                ArtworkResult.NotFound(id)
+                ArtworkRequestResult.NotFound(id)
             } else {
                 throw e
             }

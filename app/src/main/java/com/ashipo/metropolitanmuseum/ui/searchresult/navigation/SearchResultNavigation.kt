@@ -8,7 +8,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.ashipo.metropolitanmuseum.data.network.model.Artwork
+import com.ashipo.metropolitanmuseum.data.network.model.NetworkArtwork
 import com.ashipo.metropolitanmuseum.ui.searchresult.SearchResultScreenAction
 import com.ashipo.metropolitanmuseum.ui.searchresult.SearchResultScreen
 import com.ashipo.metropolitanmuseum.ui.searchresult.SearchResultViewModel
@@ -24,7 +24,7 @@ fun NavController.navigateToSearchResult(query: String) {
 }
 
 fun NavGraphBuilder.searchResultScreen(
-    onShowArtwork: (Artwork) -> Unit,
+    onShowArtwork: (NetworkArtwork) -> Unit,
     onNavigateUp: () -> Unit,
 ) {
     composable<SearchResultRoute> {
@@ -34,7 +34,7 @@ fun NavGraphBuilder.searchResultScreen(
 
 @Composable
 fun SearchResultRoute(
-    onShowArtwork: (Artwork) -> Unit,
+    onShowArtwork: (NetworkArtwork) -> Unit,
     onNavigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SearchResultViewModel = koinViewModel(),
