@@ -1,5 +1,13 @@
+@file:OptIn(ExperimentalSharedTransitionApi::class)
+
 package com.ashipo.metropolitanmuseum.ui.artworkdetail
 
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope.ResizeMode.Companion.RemeasureToBounds
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,6 +54,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.ashipo.metropolitanmuseum.R
+import com.ashipo.metropolitanmuseum.ui.LocalAnimatedVisibilityScope
+import com.ashipo.metropolitanmuseum.ui.LocalSharedTransitionScope
 import com.ashipo.metropolitanmuseum.ui.model.ArtworkImage
 import com.ashipo.metropolitanmuseum.ui.util.buildDescriptionString
 import com.github.panpf.sketch.AsyncImage
@@ -65,20 +75,40 @@ fun ArtworkDetailScreen(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(stringResource(R.string.artwork))
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = onNavigateBack,
-                        modifier = Modifier.testTag("navigateBack"),
-                    ) {
-                        Icon(Icons.AutoMirrored.Default.ArrowBack, stringResource(R.string.back))
-                    }
-                },
-                scrollBehavior = scrollBehavior,
-            )
+            val sharedTransitionScope = LocalSharedTransitionScope.current
+                ?: throw IllegalStateException("No SharedTransitionScope found")
+            val animatedVisibilityScope = LocalAnimatedVisibilityScope.current
+                ?: throw IllegalStateException("No AnimatedVisibilityScope found")
+            with(sharedTransitionScope) {
+                with(animatedVisibilityScope) {
+                    TopAppBar(
+                        title = {
+                            Text(stringResource(R.string.artwork))
+                        },
+                        navigationIcon = {
+                            IconButton(
+                                onClick = onNavigateBack,
+                                modifier = Modifier.testTag("navigateBack")
+                            ) {
+                                Icon(
+                                    Icons.AutoMirrored.Default.ArrowBack,
+                                    stringResource(R.string.back),
+                                )
+                            }
+                        },
+                        scrollBehavior = scrollBehavior,
+                        modifier = Modifier
+                            .renderInSharedTransitionScopeOverlay(
+                                zIndexInOverlay = 1f
+                            )
+                            .animateEnterExit(
+                                slideInVertically() + fadeIn(),
+                                slideOutVertically() + fadeOut(),
+                                "TopBar EnterExit"
+                            )
+                    )
+                }
+            }
         },
         modifier = modifier
             .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
@@ -165,6 +195,10 @@ private fun Images(
         modifier = modifier,
     ) {
         var currentImageIndex by rememberSaveable { mutableIntStateOf(0) }
+        // zOrder:
+        // 0 - Progress indicator. Shown below placeholder if it is present
+        // 1 - Image
+        // 2 - Error
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -178,21 +212,28 @@ private fun Images(
                 placeholder(ThumbnailMemoryCacheStateImage(images[currentImageIndex].previewUrl))
                 crossfade(fadeStart = false)
             }
-            // zOrder:
-            // 0 - Progress indicator. Shown below placeholder if it is present
-            // 1 - Image
-            // 2 - Error
-            AsyncImage(
-                request = request,
-                state = imageState,
-                contentDescription = stringResource(R.string.artwork_image_template)
-                    .format(currentImageIndex + 1),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .zIndex(1f)
-                    .testTag("image")
-            )
+            val sharedTransitionScope = LocalSharedTransitionScope.current
+                ?: throw IllegalStateException("No SharedTransitionScope found")
+            val animatedVisibilityScope = LocalAnimatedVisibilityScope.current
+                ?: throw IllegalStateException("No AnimatedVisibilityScope found")
 
+            with(sharedTransitionScope) {
+                AsyncImage(
+                    request = request,
+                    state = imageState,
+                    contentDescription = stringResource(R.string.artwork_image_template)
+                        .format(currentImageIndex + 1),
+                    modifier = Modifier
+                        .testTag("image")
+                        .zIndex(1f)
+                        .sharedBounds(
+                            rememberSharedContentState("Image$currentImageIndex"),
+                            animatedVisibilityScope,
+                            resizeMode = RemeasureToBounds,
+                        )
+                        .fillMaxSize()
+                )
+            }
             when (imageState.loadState) {
                 is LoadState.Started -> {
                     CircularProgressIndicator()

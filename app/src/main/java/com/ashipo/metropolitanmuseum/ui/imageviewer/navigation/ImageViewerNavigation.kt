@@ -1,11 +1,13 @@
 package com.ashipo.metropolitanmuseum.ui.imageviewer.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.ashipo.metropolitanmuseum.ui.LocalAnimatedVisibilityScope
 import com.ashipo.metropolitanmuseum.ui.imageviewer.ImageViewerScreen
 import com.ashipo.metropolitanmuseum.ui.model.ImageViewerParams
 import kotlinx.serialization.Serializable
@@ -24,8 +26,12 @@ fun NavGraphBuilder.imageViewerScreen(
     composable<ImageViewerRoute>(
         typeMap = mapOf(typeOf<ImageViewerParams>() to ImageViewerParamsType)
     ) { backstackEntry ->
-        val route = backstackEntry.toRoute<ImageViewerRoute>()
-        ImageViewerRoute(route.params, onNavigateUp)
+        CompositionLocalProvider(
+            LocalAnimatedVisibilityScope provides this@composable,
+        ) {
+            val route = backstackEntry.toRoute<ImageViewerRoute>()
+            ImageViewerRoute(route.params, onNavigateUp)
+        }
     }
 }
 
