@@ -8,9 +8,9 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.ashipo.metropolitanmuseum.data.network.model.NetworkArtwork
-import com.ashipo.metropolitanmuseum.ui.searchresult.SearchResultScreenAction
+import com.ashipo.metropolitanmuseum.ui.model.Artwork
 import com.ashipo.metropolitanmuseum.ui.searchresult.SearchResultScreen
+import com.ashipo.metropolitanmuseum.ui.searchresult.SearchResultScreenAction
 import com.ashipo.metropolitanmuseum.ui.searchresult.SearchResultViewModel
 import com.ashipo.metropolitanmuseum.ui.util.openUrl
 import kotlinx.serialization.Serializable
@@ -24,7 +24,7 @@ fun NavController.navigateToSearchResult(query: String) {
 }
 
 fun NavGraphBuilder.searchResultScreen(
-    onShowArtwork: (NetworkArtwork) -> Unit,
+    onShowArtwork: (Artwork) -> Unit,
     onNavigateUp: () -> Unit,
 ) {
     composable<SearchResultRoute> {
@@ -34,7 +34,7 @@ fun NavGraphBuilder.searchResultScreen(
 
 @Composable
 fun SearchResultRoute(
-    onShowArtwork: (NetworkArtwork) -> Unit,
+    onShowArtwork: (Artwork) -> Unit,
     onNavigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SearchResultViewModel = koinViewModel(),
@@ -54,7 +54,9 @@ fun SearchResultRoute(
                     onShowArtwork(action.artwork)
 
                 is SearchResultScreenAction.OpenWebpage ->
-                    openUrl(action.artwork.objectPageUrl, context)
+                    action.artwork.objectPageUrl?.let { url ->
+                        openUrl(url, context)
+                    }
 
                 else -> viewModel.onAction(action)
             }

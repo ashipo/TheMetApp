@@ -72,8 +72,10 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.ashipo.metropolitanmuseum.R
-import com.ashipo.metropolitanmuseum.data.network.model.NetworkArtwork
-import com.ashipo.metropolitanmuseum.data.network.model.ArtworkRequestResult
+import com.ashipo.metropolitanmuseum.ui.model.Artwork
+import com.ashipo.metropolitanmuseum.ui.model.ArtworkImage
+import com.ashipo.metropolitanmuseum.ui.model.ArtworkInfo
+import com.ashipo.metropolitanmuseum.ui.model.Constituent
 import com.ashipo.metropolitanmuseum.ui.util.openUrl
 import com.github.panpf.sketch.AsyncImage
 import com.github.panpf.sketch.rememberAsyncImageState
@@ -85,7 +87,7 @@ import com.github.panpf.sketch.request.LoadState as SketchLoadState
 @Composable
 fun SearchResultScreen(
     uiState: SearchResultUiState,
-    pagingArtworks: LazyPagingItems<ArtworkRequestResult>,
+    pagingArtworks: LazyPagingItems<ArtworkInfo>,
     onAction: (SearchResultScreenAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -146,21 +148,21 @@ fun SearchResultScreen(
                     key = pagingArtworks.itemKey { it.id }
                 ) { index ->
                     Column {
-                        pagingArtworks[index]?.let { artworkResult ->
-                            when (artworkResult) {
-                                is NetworkArtwork -> Artwork(
-                                    artwork = artworkResult,
+                        pagingArtworks[index]?.let { artworkInfo ->
+                            when (artworkInfo) {
+                                is Artwork -> Artwork(
+                                    artwork = artworkInfo,
                                     onShowArtwork = {
-                                        onAction(SearchResultScreenAction.ShowArtwork(artworkResult))
+                                        onAction(SearchResultScreenAction.ShowArtwork(artworkInfo))
                                     },
                                     onOpenWebpage = {
-                                        onAction(SearchResultScreenAction.OpenWebpage(artworkResult))
+                                        onAction(SearchResultScreenAction.OpenWebpage(artworkInfo))
                                     },
                                     modifier = Modifier.fillMaxWidth()
                                 )
 
-                                is ArtworkRequestResult.NotFound -> NotFoundPlaceholder(
-                                    artworkResult.id,
+                                is ArtworkInfo.NotFound -> NotFoundPlaceholder(
+                                    artworkInfo.id,
                                     Modifier.fillMaxWidth()
                                 )
                             }
@@ -217,31 +219,27 @@ private val artworkSize = Modifier
 
 @Composable
 private fun Artwork(
-    artwork: NetworkArtwork,
+    artwork: Artwork,
     onShowArtwork: () -> Unit,
     onOpenWebpage: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val primaryInfo = artwork.title.ifBlank {
-        artwork.objectName
-    }
+    val title = artwork.title
+    val variousCreators = stringResource(R.string.various_creators)
     val secondaryInfo = remember(artwork) {
         buildList {
-            if (artwork.artistName.isNotBlank()) {
-                add(artwork.artistName)
+            if (artwork.constituents.isNotEmpty()) {
+                val creator = if (artwork.constituents.size == 1) {
+                    artwork.constituents.first().name
+                } else {
+                    variousCreators
+                }
+                add(creator)
             }
-            if (artwork.culture.isNotBlank()) {
-                add(artwork.culture)
-            }
-            if (artwork.period.isNotBlank()) {
-                add(artwork.period)
-            }
-            if (artwork.date.isNotBlank()) {
-                add(artwork.date)
-            }
-            if (artwork.classification.isNotBlank()) {
-                add(artwork.classification)
-            }
+            artwork.culture?.let { add(it) }
+            artwork.period?.let { add(it) }
+            artwork.date?.let { add(it) }
+            artwork.classification?.let { add(it) }
         }
     }
     Column(modifier.testTag("artwork:${artwork.id}")) {
@@ -255,7 +253,7 @@ private fun Artwork(
                 .then(artworkSize)
         ) {
             Text(
-                text = primaryInfo,
+                text = title,
                 fontWeight = FontWeight.Bold,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
@@ -391,7 +389,7 @@ private val previewSize = Modifier
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ArtworkPreview(
-    artwork: NetworkArtwork,
+    artwork: Artwork,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -401,7 +399,7 @@ private fun ArtworkPreview(
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .semantics(mergeDescendants = true) {}
     ) {
-        if (artwork.primaryImagePreviewUrl.isBlank()) {
+        if (artwork.images.isEmpty()) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -432,7 +430,7 @@ private fun ArtworkPreview(
         } else {
             val imageState = rememberAsyncImageState()
             AsyncImage(
-                uri = artwork.primaryImagePreviewUrl,
+                uri = artwork.images.first().previewUrl,
                 state = imageState,
                 contentDescription = stringResource(R.string.artwork_preview),
                 modifier = Modifier
@@ -469,75 +467,55 @@ private fun ArtworkPreview(
 @Preview(showBackground = true)
 @Composable
 private fun ArtworkWithoutPreviewPreview() {
-    ArtworkPreview(title = "Short title", artistName = "Artist name")
+    val artwork = createArtwork(title = "Short title")
+    Artwork(artwork, {}, {})
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun ArtworkErrorLoadingPreviewPreview() {
-    ArtworkPreview(
-        previewUrl = "https:www.test.com"
+    val images = listOf(
+        ArtworkImage(
+            originalUrl = "original.com",
+            largeUrl = "large.com",
+            previewUrl = "preview.com",
+        )
     )
-}
-
-@Composable
-private fun ArtworkPreview(
-    id: Int = 880055,
-    isHighlight: Boolean = true,
-    isPublicDomain: Boolean = true,
-    department: String = "Egyptian Art",
-    objectName: String = "Object name",
-    title: String = "Great Pyramid of Giza ".repeat(20),
-    culture: String = "B ".repeat(255),
-    period: String = "Old Kingdom Old Kingdom Old 1 2 3 4 5 6 7 8 9 0 1 2 3 4",
-    artistPrefix: String = "prefix",
-    artistName: String = "Picasso ".repeat(20),
-    artistRole: String = "Painter",
-    artistBio: String = "One of the artists of all times",
-    artistSuffix: String = "suffix",
-    date: String = "2600 BC",
-    medium: String = "Oil on canvas",
-    classification: String = "Pyramid",
-    previewUrl: String = "",
-    objectPageUrl: String = "https://www.metmuseum.org/art/collection/search/753523",
-) {
-    val artwork = NetworkArtwork(
-        id = id,
-        isHighlight = isHighlight,
-        isPublicDomain = isPublicDomain,
-        department = department,
-        objectName = objectName,
-        title = title,
-        culture = culture,
-        period = period,
-        constituents = emptyList(),
-        artistPrefix = artistPrefix,
-        artistName = artistName,
-        artistRole = artistRole,
-        artistBio = artistBio,
-        artistSuffix = artistSuffix,
-        date = date,
-        medium = medium,
-        geographyType = "",
-        city = "",
-        state = "",
-        county = "",
-        country = "",
-        region = "",
-        subregion = "",
-        locale = "",
-        locus = "",
-        excavation = "",
-        river = "",
-        classification = classification,
-        primaryImagePreviewUrl = previewUrl,
-        primaryImageUrl = "",
-        additionalImagesUrls = emptyList(),
-        objectPageUrl = objectPageUrl,
-        tags = emptyList(),
-    )
+    val artwork = createArtwork(images = images)
     Artwork(artwork, {}, {})
 }
+
+private fun createArtwork(
+    id: Int = 880055,
+    title: String = "Great Pyramid of Giza ".repeat(20),
+    constituents: List<Constituent> = listOf(
+        Constituent("Painter", "Picasso")
+    ),
+    isPublicDomain: Boolean = true,
+    department: String = "Egyptian Art",
+    culture: String = "B ".repeat(255),
+    period: String = "Old Kingdom Old Kingdom Old 1 2 3 4 5 6 7 8 9 0 1 2 3 4",
+    date: String = "2600 BC",
+    geography: String = "Milky way, Solar system, Earth",
+    medium: String = "Oil on canvas",
+    classification: String = "Pyramid",
+    objectPageUrl: String = "https://www.metmuseum.org/art/collection/search/753523",
+    images: List<ArtworkImage> = emptyList(),
+) = Artwork(
+    id = id,
+    title = title,
+    constituents = constituents,
+    period = period,
+    date = date,
+    geography = geography,
+    culture = culture,
+    medium = medium,
+    classification = classification,
+    department = department,
+    objectPageUrl = objectPageUrl,
+    isPublicDomain = isPublicDomain,
+    images = images,
+)
 
 @Preview(showBackground = true)
 @Composable
@@ -548,7 +526,7 @@ private fun NotFoundPlaceholderPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun ErrorScreenPreview() {
-    val items: List<ArtworkRequestResult> = emptyList()
+    val items: List<ArtworkInfo> = emptyList()
     val pagingItems = MutableStateFlow(PagingData.from(items)).collectAsLazyPagingItems()
     SearchResultScreen(
         uiState = SearchResultUiState.Error,
@@ -560,7 +538,7 @@ private fun ErrorScreenPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun LoadingScreenPreview() {
-    val items: List<ArtworkRequestResult> = emptyList()
+    val items: List<ArtworkInfo> = emptyList()
     val pagingItems = MutableStateFlow(PagingData.from(items)).collectAsLazyPagingItems()
     SearchResultScreen(
         uiState = SearchResultUiState.Loading,
@@ -572,8 +550,8 @@ private fun LoadingScreenPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun SuccessScreenPreview() {
-    val items: List<ArtworkRequestResult> = List(20) { i ->
-        NetworkArtwork(id = i, title = "Artwork №$i", culture = "Culture", date = "Date")
+    val items: List<ArtworkInfo> = List(20) { i ->
+        createArtwork(id = i, title = "Artwork №$i", culture = "Culture", date = "Date")
     }
     val pagingItems = MutableStateFlow(PagingData.from(items)).collectAsLazyPagingItems()
     SearchResultScreen(

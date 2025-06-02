@@ -49,6 +49,7 @@
     <string name="reload_failed_image">Couldn\'t load image. Tap to reload.</string>
     <string name="artwork_page">Artwork\'s page</string>
     <string name="see_more">See more</string>
+    <string name="various_creators">Various artists/makers</string>
     <!--1 - artwork id-->
     <string name="not_found_title_template">Couldn\'t load artwork %1$s</string>
     <string name="not_found_desc">The artwork is not available through the public API, but may be available on the museum\'s website</string>

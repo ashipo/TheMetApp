@@ -38,7 +38,7 @@ data class NetworkArtwork(
     val title: String = "",
     val culture: String = "",
     val period: String = "",
-    val constituents: List<Constituent>? = null,
+    val constituents: List<NetworkConstituent>? = null,
     val artistRole: String = "",
     val artistPrefix: String = "",
     @SerializedName("artistDisplayName")
@@ -50,7 +50,7 @@ data class NetworkArtwork(
     val date: String = "",
     val medium: String = "",
     val classification: String = "",
-    val tags: List<Tag>? = null,
+    val tags: List<NetworkTag>? = null,
 
     val geographyType: String = "",
     val city: String = "",
@@ -73,32 +73,3 @@ data class NetworkArtwork(
     @SerializedName("objectURL")
     val objectPageUrl: String = "",
 ) : ArtworkRequestResult
-
-sealed interface ArtworkRequestResult {
-
-    val id: Int
-
-    data class NotFound(override val id: Int) : ArtworkRequestResult
-}
-
-@Serializable
-data class Tag(
-    val term: String,
-    @SerializedName("AAT_URL")
-    val aatUrl: String,
-    @SerializedName("Wikidata_URL")
-    val wikidataUrl: String,
-)
-
-@Serializable
-data class Constituent(
-    @SerializedName("constituentID")
-    val id: Int,
-    val role: String,
-    val name: String,
-    @SerializedName("constituentULAN_URL")
-    val ulanUrl: String,
-    @SerializedName("constituentWikidata_URL")
-    val wikidataUrl: String,
-    val gender: String,
-)
