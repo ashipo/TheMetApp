@@ -28,7 +28,7 @@ import kotlinx.serialization.Serializable
  * @param objectPageUrl URL to object's page on metmuseum.org
  */
 @Serializable
-data class Artwork(
+data class NetworkArtwork(
     @SerializedName("objectID")
     override val id: Int,
     val isHighlight: Boolean = false,
@@ -38,7 +38,7 @@ data class Artwork(
     val title: String = "",
     val culture: String = "",
     val period: String = "",
-    val constituents: List<Constituent>? = null,
+    val constituents: List<NetworkConstituent>? = null,
     val artistRole: String = "",
     val artistPrefix: String = "",
     @SerializedName("artistDisplayName")
@@ -50,7 +50,7 @@ data class Artwork(
     val date: String = "",
     val medium: String = "",
     val classification: String = "",
-    val tags: List<Tag>? = null,
+    val tags: List<NetworkTag>? = null,
 
     val geographyType: String = "",
     val city: String = "",
@@ -72,33 +72,4 @@ data class Artwork(
     val additionalImagesUrls: List<String>? = null,
     @SerializedName("objectURL")
     val objectPageUrl: String = "",
-) : ArtworkResult
-
-sealed interface ArtworkResult {
-
-    val id: Int
-
-    data class NotFound(override val id: Int) : ArtworkResult
-}
-
-@Serializable
-data class Tag(
-    val term: String,
-    @SerializedName("AAT_URL")
-    val aatUrl: String,
-    @SerializedName("Wikidata_URL")
-    val wikidataUrl: String,
-)
-
-@Serializable
-data class Constituent(
-    @SerializedName("constituentID")
-    val id: Int,
-    val role: String,
-    val name: String,
-    @SerializedName("constituentULAN_URL")
-    val ulanUrl: String,
-    @SerializedName("constituentWikidata_URL")
-    val wikidataUrl: String,
-    val gender: String,
-)
+) : ArtworkRequestResult

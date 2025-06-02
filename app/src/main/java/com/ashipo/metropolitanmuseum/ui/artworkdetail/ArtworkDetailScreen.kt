@@ -57,6 +57,7 @@ import com.ashipo.metropolitanmuseum.R
 import com.ashipo.metropolitanmuseum.ui.LocalAnimatedVisibilityScope
 import com.ashipo.metropolitanmuseum.ui.LocalSharedTransitionScope
 import com.ashipo.metropolitanmuseum.ui.model.ArtworkImage
+import com.ashipo.metropolitanmuseum.ui.model.Constituent
 import com.ashipo.metropolitanmuseum.ui.util.buildDescriptionString
 import com.github.panpf.sketch.AsyncImage
 import com.github.panpf.sketch.rememberAsyncImageState
@@ -135,43 +136,33 @@ fun ArtworkDetailScreen(
             ) {
                 Text(buildDescriptionString(stringResource(R.string.title), uiState.title))
                 for (constituent in uiState.constituents) {
-                    Text(buildDescriptionString(constituent.role, constituent.info))
+                    Text(buildDescriptionString(constituent.role, constituent.name))
                 }
-                if (uiState.period.isNotBlank()) {
-                    Text(buildDescriptionString(stringResource(R.string.period), uiState.period))
+                uiState.period?.let { period ->
+                    Text(buildDescriptionString(stringResource(R.string.period), period))
                 }
-                if (uiState.date.isNotBlank()) {
-                    Text(buildDescriptionString(stringResource(R.string.date), uiState.date))
+                uiState.date?.let { date ->
+                    Text(buildDescriptionString(stringResource(R.string.date), date))
                 }
-                if (uiState.geography.isNotBlank()) {
-                    Text(
-                        buildDescriptionString(
-                            stringResource(R.string.geography),
-                            uiState.geography
-                        )
-                    )
+                uiState.geography?.let { geography ->
+                    Text(buildDescriptionString(stringResource(R.string.geography), geography))
                 }
-                if (uiState.culture.isNotBlank()) {
-                    Text(buildDescriptionString(stringResource(R.string.culture), uiState.culture))
+                uiState.culture?.let { culture ->
+                    Text(buildDescriptionString(stringResource(R.string.culture), culture))
                 }
-                if (uiState.medium.isNotBlank()) {
-                    Text(buildDescriptionString(stringResource(R.string.medium), uiState.medium))
+                uiState.medium?.let { medium ->
+                    Text(buildDescriptionString(stringResource(R.string.medium), medium))
                 }
-                if (uiState.classification.isNotBlank()) {
+                uiState.classification?.let { classification ->
                     Text(
                         buildDescriptionString(
                             stringResource(R.string.classification),
-                            uiState.classification
+                            classification
                         )
                     )
                 }
-                if (uiState.department.isNotBlank()) {
-                    Text(
-                        buildDescriptionString(
-                            stringResource(R.string.department),
-                            uiState.department
-                        )
-                    )
+                uiState.department?.let { department ->
+                    Text(buildDescriptionString(stringResource(R.string.department), department))
                 }
             }
         }
@@ -300,8 +291,8 @@ private fun ArtworkDetailScreenPreview() {
         id = 12345,
         title = "Great Pyramid of Giza",
         constituents = listOf(
-            ConstituentInfo("Designer", "Asterix"),
-            ConstituentInfo("Builder", "Obelix")
+            Constituent("Designer", "Asterix"),
+            Constituent("Builder", "Obelix")
         ),
         date = "2600 BC",
         geography = "Egypt",

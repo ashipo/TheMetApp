@@ -1,7 +1,7 @@
 package com.ashipo.metropolitanmuseum.data.network
 
-import com.ashipo.metropolitanmuseum.data.network.model.Artwork
-import com.ashipo.metropolitanmuseum.data.network.model.ArtworkResult
+import com.ashipo.metropolitanmuseum.data.network.model.NetworkArtwork
+import com.ashipo.metropolitanmuseum.data.network.model.ArtworkRequestResult
 import com.ashipo.metropolitanmuseum.data.network.model.NetworkDepartment
 import com.ashipo.metropolitanmuseum.data.network.model.NetworkDepartments
 import com.ashipo.metropolitanmuseum.data.network.model.SearchResult
@@ -53,7 +53,7 @@ class RetrofitNetworkDataSourceTest {
 
     @Test
     fun `getArtwork - returns existing artwork`() = runTest {
-        val expected = Artwork(id = 123, isPublicDomain = true)
+        val expected = NetworkArtwork(id = 123, isPublicDomain = true)
         api.addArtwork(expected)
 
         val actual = subject.getArtwork(123)
@@ -63,7 +63,7 @@ class RetrofitNetworkDataSourceTest {
 
     @Test
     fun `getArtwork - returns NotFound if api throws HttpException with code 404`() = runTest {
-        val expected = ArtworkResult.NotFound(123)
+        val expected = ArtworkRequestResult.NotFound(123)
 
         val actual = subject.getArtwork(123)
 

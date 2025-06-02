@@ -3,9 +3,9 @@ package com.ashipo.metropolitanmuseum.data
 import android.util.Log
 import androidx.paging.PagingSource
 import com.ashipo.metropolitanmuseum.SearchPrefs
-import com.ashipo.metropolitanmuseum.data.network.model.ArtworkResult
 import com.ashipo.metropolitanmuseum.data.network.ArtworkPagingSource
 import com.ashipo.metropolitanmuseum.data.network.NetworkDataSource
+import com.ashipo.metropolitanmuseum.ui.model.ArtworkInfo
 import kotlinx.coroutines.flow.first
 import retrofit2.HttpException
 
@@ -18,7 +18,7 @@ class DefaultSearchResultRepository(
     private var artworkIds: List<Int> = emptyList()
 
     // The last created instance of PagingSource, stored to invalidate
-    private var lastPagingSource: PagingSource<Int, ArtworkResult>? = null
+    private var lastPagingSource: PagingSource<Int, ArtworkInfo>? = null
 
     override val pagingSourceFactory = {
         ArtworkPagingSource(artworksRepository, artworkIds.toList())

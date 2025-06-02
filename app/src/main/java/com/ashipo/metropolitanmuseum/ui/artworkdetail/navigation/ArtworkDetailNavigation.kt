@@ -6,10 +6,10 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.ashipo.metropolitanmuseum.data.network.model.Artwork
 import com.ashipo.metropolitanmuseum.ui.LocalAnimatedVisibilityScope
 import com.ashipo.metropolitanmuseum.ui.artworkdetail.ArtworkDetailScreen
 import com.ashipo.metropolitanmuseum.ui.artworkdetail.ArtworkDetailViewModel
+import com.ashipo.metropolitanmuseum.ui.model.Artwork
 import com.ashipo.metropolitanmuseum.ui.model.ImageViewerParams
 import kotlinx.serialization.Serializable
 import org.koin.androidx.compose.koinViewModel

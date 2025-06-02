@@ -1,12 +1,22 @@
+@file:OptIn(ExperimentalSharedTransitionApi::class)
+
 package com.ashipo.metropolitanmuseum.ui.artworkdetail
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
+import com.ashipo.metropolitanmuseum.ui.LocalAnimatedVisibilityScope
+import com.ashipo.metropolitanmuseum.ui.LocalSharedTransitionScope
 import com.ashipo.metropolitanmuseum.ui.model.ArtworkImage
+import com.ashipo.metropolitanmuseum.ui.model.Constituent
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
 import org.junit.Rule
@@ -21,11 +31,13 @@ class ArtworkDetailScreenTest {
     fun backButton_onClick_navigatesBack() {
         var actual = false
         composeTestRule.setContent {
-            ArtworkDetailScreen(
-                ArtworkDetailScreenState(),
-                { actual = true },
-                {},
-            )
+            SharedScopes {
+                ArtworkDetailScreen(
+                    ArtworkDetailScreenState(id = 1, title = "Title"),
+                    { actual = true },
+                    {},
+                )
+            }
         }
 
         composeTestRule.onNodeWithTag("navigateBack").performClick()
@@ -37,10 +49,11 @@ class ArtworkDetailScreenTest {
     fun artworkInfo_isDisplayed() {
         // Tags are not displayed currently
         val state = ArtworkDetailScreenState(
+            id = 123,
             title = "Chewbacca's bowcaster",
             constituents = listOf(
-                ConstituentInfo("The Emperor", "Palpatine"),
-                ConstituentInfo("Jedi Master", "Luke Skywalker"),
+                Constituent("The Emperor", "Palpatine"),
+                Constituent("Jedi Master", "Luke Skywalker"),
             ),
             period = "A long time ago",
             date = "32 BBY - 35 ABY",
@@ -52,22 +65,24 @@ class ArtworkDetailScreenTest {
         )
 
         composeTestRule.setContent {
-            ArtworkDetailScreen(state, {}, {})
+            SharedScopes {
+                ArtworkDetailScreen(state, {}, {})
+            }
         }
 
         composeTestRule.apply {
             onNodeWithText(state.title, true).assertExists()
             for (constituent in state.constituents) {
                 composeTestRule.onNodeWithText(constituent.role, true).assertExists()
-                composeTestRule.onNodeWithText(constituent.info, true).assertExists()
+                composeTestRule.onNodeWithText(constituent.name, true).assertExists()
             }
-            onNodeWithText(state.period, true).assertExists()
-            onNodeWithText(state.date, true).assertExists()
-            onNodeWithText(state.geography, true).assertExists()
-            onNodeWithText(state.culture, true).assertExists()
-            onNodeWithText(state.medium, true).assertExists()
-            onNodeWithText(state.classification, true).assertExists()
-            onNodeWithText(state.department, true).assertExists()
+            onNodeWithText(state.period!!, true).assertExists()
+            onNodeWithText(state.date!!, true).assertExists()
+            onNodeWithText(state.geography!!, true).assertExists()
+            onNodeWithText(state.culture!!, true).assertExists()
+            onNodeWithText(state.medium!!, true).assertExists()
+            onNodeWithText(state.classification!!, true).assertExists()
+            onNodeWithText(state.department!!, true).assertExists()
         }
     }
 
@@ -82,8 +97,10 @@ class ArtworkDetailScreenTest {
         }
 
         composeTestRule.setContent {
-            ArtworkDetailScreen(
-                ArtworkDetailScreenState(images = images), {}, {})
+            SharedScopes {
+                ArtworkDetailScreen(
+                    ArtworkDetailScreenState(1, "Title", images = images), {}, {})
+            }
         }
 
         composeTestRule.apply {
@@ -108,8 +125,10 @@ class ArtworkDetailScreenTest {
         val expectedIndex = images.lastIndex
         var actualIndex: Int? = null
         composeTestRule.setContent {
-            ArtworkDetailScreen(
-                ArtworkDetailScreenState(images = images), {}, { actualIndex = it })
+            SharedScopes {
+                ArtworkDetailScreen(
+                    ArtworkDetailScreenState(1, "Title", images = images), {}, { actualIndex = it })
+            }
         }
 
         composeTestRule.apply {
@@ -123,5 +142,18 @@ class ArtworkDetailScreenTest {
         }
 
         assertEquals(expectedIndex, actualIndex)
+    }
+}
+
+@Composable
+private fun SharedScopes(content: @Composable () -> Unit) {
+    SharedTransitionLayout {
+        CompositionLocalProvider(LocalSharedTransitionScope provides this) {
+            AnimatedVisibility(true) {
+                CompositionLocalProvider(LocalAnimatedVisibilityScope provides this) {
+                    content()
+                }
+            }
+        }
     }
 }

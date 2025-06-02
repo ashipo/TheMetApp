@@ -10,7 +10,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.ashipo.metropolitanmuseum.data.SearchResultRepository
 import com.ashipo.metropolitanmuseum.data.network.PAGE_SIZE
-import com.ashipo.metropolitanmuseum.data.network.model.ArtworkResult
+import com.ashipo.metropolitanmuseum.ui.model.ArtworkInfo
 import com.ashipo.metropolitanmuseum.ui.searchresult.navigation.SearchResultRoute
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,7 +35,7 @@ class SearchResultViewModel(
         pagingSourceFactory = searchResultRepository.pagingSourceFactory,
     )
 
-    val pagingArtworks: Flow<PagingData<ArtworkResult>> = pager.flow.cachedIn(viewModelScope)
+    val pagingArtworks: Flow<PagingData<ArtworkInfo>> = pager.flow.cachedIn(viewModelScope)
 
     init {
         search()

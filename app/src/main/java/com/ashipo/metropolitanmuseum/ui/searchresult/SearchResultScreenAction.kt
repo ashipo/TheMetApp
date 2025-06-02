@@ -1,6 +1,6 @@
 package com.ashipo.metropolitanmuseum.ui.searchresult
 
-import com.ashipo.metropolitanmuseum.data.network.model.Artwork
+import com.ashipo.metropolitanmuseum.ui.model.Artwork
 
 sealed interface SearchResultScreenAction {
     data object Search : SearchResultScreenAction

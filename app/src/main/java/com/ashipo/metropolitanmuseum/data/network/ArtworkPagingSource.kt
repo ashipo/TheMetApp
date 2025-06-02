@@ -3,16 +3,16 @@ package com.ashipo.metropolitanmuseum.data.network
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.ashipo.metropolitanmuseum.data.ArtworksRepository
-import com.ashipo.metropolitanmuseum.data.network.model.ArtworkResult
+import com.ashipo.metropolitanmuseum.ui.model.ArtworkInfo
 
 const val PAGE_SIZE = 15
 
 class ArtworkPagingSource(
     private val artworksRepository: ArtworksRepository,
     private val artworkIds: List<Int>,
-) : PagingSource<Int, ArtworkResult>() {
+) : PagingSource<Int, ArtworkInfo>() {
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ArtworkResult> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, ArtworkInfo> {
         try {
             // Might be negative
             val pageKey = params.key ?: STARTING_KEY
@@ -43,7 +43,7 @@ class ArtworkPagingSource(
         }
     }
 
-    override fun getRefreshKey(state: PagingState<Int, ArtworkResult>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, ArtworkInfo>): Int? {
         val anchorPosition = state.anchorPosition ?: return null
         return (anchorPosition - state.config.initialLoadSize / 2).coerceAtLeast(STARTING_KEY)
     }

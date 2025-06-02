@@ -2,20 +2,14 @@ package com.ashipo.metropolitanmuseum.ui.artworkdetail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.testing.invoke
-import com.ashipo.metropolitanmuseum.data.getLargeImageUrl
-import com.ashipo.metropolitanmuseum.data.getPreviewImageUrl
-import com.ashipo.metropolitanmuseum.data.network.model.Artwork
-import com.ashipo.metropolitanmuseum.data.network.model.Constituent
-import com.ashipo.metropolitanmuseum.data.network.model.Tag
 import com.ashipo.metropolitanmuseum.ui.artworkdetail.navigation.ArtworkDetailRoute
 import com.ashipo.metropolitanmuseum.ui.artworkdetail.navigation.ArtworkType
-import com.ashipo.metropolitanmuseum.ui.model.ArtworkImage
+import com.ashipo.metropolitanmuseum.ui.model.Artwork
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import kotlin.reflect.typeOf
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 @RunWith(RobolectricTestRunner::class)
 class ArtworkDetailViewModelTest {
@@ -27,6 +21,7 @@ class ArtworkDetailViewModelTest {
         val expected = 123
         val artwork = Artwork(
             id = expected,
+            title = "title",
         )
 
         val model = ArtworkDetailViewModel(SavedStateHandle(ArtworkDetailRoute(artwork), typeMap))
@@ -36,7 +31,7 @@ class ArtworkDetailViewModelTest {
     }
 
     @Test
-    fun `uiState_title - when Artwork_title is not blank - same as Artwork_title`() {
+    fun `uiState_title - backed up by Artwork_title`() {
         val expected = "Jaguar Whistling Jar"
         val artwork = Artwork(
             id = 1,
@@ -49,57 +44,12 @@ class ArtworkDetailViewModelTest {
         assertEquals(expected, actual)
     }
 
-
-    @Test
-    // Example id: 503542
-    fun `uiState_title - when Artwork_title is blank - same as Artwork_objectName`() {
-        val expected = "Jaguar Whistling Jar"
-        val artwork = Artwork(
-            id = 1,
-            title = "",
-            objectName = expected,
-        )
-
-        val model = ArtworkDetailViewModel(SavedStateHandle(ArtworkDetailRoute(artwork), typeMap))
-        val actual = model.uiState.title
-
-        assertEquals(expected, actual)
-    }
-
-    @Test
-    fun `uiState_constituents - backed up by Artwork_constituents`() {
-        val constituents = List(3) { i ->
-            Constituent(
-                id = i,
-                role = "role $i",
-                name = "name $i",
-                ulanUrl = "",
-                wikidataUrl = "",
-                gender = "",
-            )
-        }
-        val artwork = Artwork(
-            id = 1,
-            constituents = constituents,
-        )
-
-        val model = ArtworkDetailViewModel(SavedStateHandle(ArtworkDetailRoute(artwork), typeMap))
-        val actual = model.uiState.constituents
-
-        assertEquals(constituents.size, actual.size)
-        for (i in constituents.indices) {
-            val constituent = constituents[i]
-            val actualInfo = actual[i]
-            assertTrue(actualInfo.role.contains(constituent.role))
-            assertTrue(actualInfo.info.contains(constituent.name))
-        }
-    }
-
     @Test
     fun `uiState_period - backed up by Artwork_period`() {
         val expected = "Late 90's"
         val artwork = Artwork(
             id = 1,
+            title = "title",
             period = expected,
         )
 
@@ -114,6 +64,7 @@ class ArtworkDetailViewModelTest {
         val expected = "Late 90's"
         val artwork = Artwork(
             id = 1,
+            title = "title",
             date = expected,
         )
 
@@ -124,34 +75,18 @@ class ArtworkDetailViewModelTest {
     }
 
     @Test
-    fun `uiState_geography - backed up by geography-related Artwork fields`() {
+    fun `uiState_geography - backed up by Artwork_geography`() {
+        val expected = "Arctica, Iceberg"
         val artwork = Artwork(
             id = 1,
-            city = "Amsterdam",
-            state = "Rajasthan",
-            county = "Lincolnshire",
-            country = "East Timor",
-            region = "Northern",
-            subregion = "Deir el-Bahri",
-            locale = "Temple of Hatshepsut",
-            locus = "Pit 477",
-            excavation = "MMA excavations, 1923–24",
-            river = "Volga river",
+            title = "title",
+            geography = expected,
         )
 
         val model = ArtworkDetailViewModel(SavedStateHandle(ArtworkDetailRoute(artwork), typeMap))
         val actual = model.uiState.geography
 
-        assertTrue(actual.contains("Amsterdam"))
-        assertTrue(actual.contains("Rajasthan"))
-        assertTrue(actual.contains("Lincolnshire"))
-        assertTrue(actual.contains("East Timor"))
-        assertTrue(actual.contains("Northern"))
-        assertTrue(actual.contains("Deir el-Bahri"))
-        assertTrue(actual.contains("Temple of Hatshepsut"))
-        assertTrue(actual.contains("Pit 477"))
-        assertTrue(actual.contains("MMA excavations, 1923–24"))
-        assertTrue(actual.contains("Volga river"))
+        assertEquals(expected, actual)
     }
 
     @Test
@@ -159,6 +94,7 @@ class ArtworkDetailViewModelTest {
         val expected = "Persian"
         val artwork = Artwork(
             id = 1,
+            title = "title",
             culture = expected,
         )
 
@@ -173,6 +109,7 @@ class ArtworkDetailViewModelTest {
         val expected = "Wood"
         val artwork = Artwork(
             id = 1,
+            title = "title",
             medium = expected,
         )
 
@@ -187,6 +124,7 @@ class ArtworkDetailViewModelTest {
         val expected = "Sculpture"
         val artwork = Artwork(
             id = 1,
+            title = "title",
             classification = expected,
         )
 
@@ -201,95 +139,12 @@ class ArtworkDetailViewModelTest {
         val expected = "Egyptian Art"
         val artwork = Artwork(
             id = 1,
+            title = "title",
             department = expected,
         )
 
         val model = ArtworkDetailViewModel(SavedStateHandle(ArtworkDetailRoute(artwork), typeMap))
         val actual = model.uiState.department
-
-        assertEquals(expected, actual)
-    }
-
-    @Test
-    fun `uiState_images - when Artwork_primaryImage is blank - is empty`() {
-        val artwork = Artwork(
-            id = 1,
-            primaryImageUrl = "  ",
-        )
-
-        val model = ArtworkDetailViewModel(SavedStateHandle(ArtworkDetailRoute(artwork), typeMap))
-        val actual = model.uiState.images
-
-        assertTrue { actual.isEmpty() }
-    }
-
-
-    @Test
-    fun `uiState_images - backed up by images-related Artwork fields`() {
-        val primaryImage =
-            "https://images.metmuseum.org/CRDImages/gr/original/DP-18928-001.jpg"
-        val primaryImagePreview = getPreviewImageUrl(primaryImage)
-        val additionalImages = listOf(
-            "https://images.metmuseum.org/CRDImages/gr/original/DP-18928-002.jpg",
-            "https://images.metmuseum.org/CRDImages/gr/original/DP-18928-003.jpg",
-        )
-        val artwork = Artwork(
-            id = 1,
-            primaryImageUrl = primaryImage,
-            primaryImagePreviewUrl = primaryImagePreview,
-            additionalImagesUrls = additionalImages,
-        )
-        val expected = buildList {
-            add(
-                ArtworkImage(
-                    primaryImage,
-                    getLargeImageUrl(primaryImage),
-                    getPreviewImageUrl(primaryImage),
-                )
-            )
-            additionalImages.forEach { image ->
-                add(
-                    ArtworkImage(
-                        image,
-                        getLargeImageUrl(image),
-                        getPreviewImageUrl(image),
-                    )
-                )
-            }
-        }
-
-        val model = ArtworkDetailViewModel(SavedStateHandle(ArtworkDetailRoute(artwork), typeMap))
-        val actual = model.uiState.images
-
-        assertEquals(expected, actual)
-    }
-
-    fun `uiState_tags - when Artwork_tags is null - is empty`() {
-        val artwork = Artwork(
-            id = 1,
-            tags = null,
-        )
-
-        val model = ArtworkDetailViewModel(SavedStateHandle(ArtworkDetailRoute(artwork), typeMap))
-        val actual = model.uiState.tags
-
-        assertTrue { actual.isEmpty() }
-    }
-
-    @Test
-    fun `uiState_tags - backed up by Artwork_tags`() {
-        val tags = listOf(
-            Tag("Portrait", "www.aat.url/1", "www.wiki.url/1"),
-            Tag("Painting", "www.aat.url/2", "www.wiki.url/2"),
-        )
-        val artwork = Artwork(
-            id = 1,
-            tags = tags,
-        )
-        val expected = tags.map { it.term }
-
-        val model = ArtworkDetailViewModel(SavedStateHandle(ArtworkDetailRoute(artwork), typeMap))
-        val actual = model.uiState.tags
 
         assertEquals(expected, actual)
     }

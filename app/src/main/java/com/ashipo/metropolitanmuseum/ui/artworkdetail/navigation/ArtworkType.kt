@@ -3,7 +3,7 @@ package com.ashipo.metropolitanmuseum.ui.artworkdetail.navigation
 import android.net.Uri
 import androidx.navigation.NavType
 import androidx.savedstate.SavedState
-import com.ashipo.metropolitanmuseum.data.network.model.Artwork
+import com.ashipo.metropolitanmuseum.ui.model.Artwork
 import kotlinx.serialization.json.Json
 
 val ArtworkType = object : NavType<Artwork>(false) {
