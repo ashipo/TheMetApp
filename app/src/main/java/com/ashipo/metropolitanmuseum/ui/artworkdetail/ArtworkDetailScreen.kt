@@ -107,7 +107,7 @@ fun ArtworkDetailScreen(
                             .animateEnterExit(
                                 slideInVertically() + fadeIn(),
                                 slideOutVertically() + fadeOut(),
-                                "TopBar EnterExit"
+                                "ArtworkDetailScreen TopBar EnterExit"
                             )
                     )
                 }
@@ -117,55 +117,140 @@ fun ArtworkDetailScreen(
             .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
             .nestedScroll(scrollBehavior.nestedScrollConnection),
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding)
-                .fillMaxSize()
-        ) {
-            if (uiState.images.isNotEmpty()) {
-                Images(
-                    id = uiState.id,
-                    images = uiState.images,
-                    onShowFullscreen = onShowFullscreen,
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
+        val sharedTransitionScope = LocalSharedTransitionScope.current
+            ?: throw IllegalStateException("No SharedTransitionScope found")
+        val animatedVisibilityScope = LocalAnimatedVisibilityScope.current
+            ?: throw IllegalStateException("No AnimatedVisibilityScope found")
+        with(sharedTransitionScope) {
             Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .verticalScroll(rememberScrollState())
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding)
+                    .sharedBounds(
+                        rememberSharedContentState(
+                            SharedKey(uiState.id, SharedElementType.Bounds)
+                        ),
+                        animatedVisibilityScope,
+                    )
+                    .fillMaxSize()
             ) {
-                Text(buildDescriptionString(stringResource(R.string.title), uiState.title))
-                for (constituent in uiState.constituents) {
-                    Text(buildDescriptionString(constituent.role, constituent.name))
-                }
-                uiState.period?.let { period ->
-                    Text(buildDescriptionString(stringResource(R.string.period), period))
-                }
-                uiState.date?.let { date ->
-                    Text(buildDescriptionString(stringResource(R.string.date), date))
-                }
-                uiState.geography?.let { geography ->
-                    Text(buildDescriptionString(stringResource(R.string.geography), geography))
-                }
-                uiState.culture?.let { culture ->
-                    Text(buildDescriptionString(stringResource(R.string.culture), culture))
-                }
-                uiState.medium?.let { medium ->
-                    Text(buildDescriptionString(stringResource(R.string.medium), medium))
-                }
-                uiState.classification?.let { classification ->
-                    Text(
-                        buildDescriptionString(
-                            stringResource(R.string.classification),
-                            classification
-                        )
+                if (uiState.images.isNotEmpty()) {
+                    Images(
+                        id = uiState.id,
+                        images = uiState.images,
+                        onShowFullscreen = onShowFullscreen,
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
-                uiState.department?.let { department ->
-                    Text(buildDescriptionString(stringResource(R.string.department), department))
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    // Title
+                    Text(
+                        buildDescriptionString(stringResource(R.string.title), uiState.title),
+                        modifier = Modifier
+                            .sharedBounds(
+                                rememberSharedContentState(
+                                    SharedKey(uiState.id, SharedElementType.Title)
+                                ),
+                                animatedVisibilityScope,
+                            )
+                    )
+                    // Constituents
+                    if (uiState.constituents.size == 1) {
+                        val constituent = uiState.constituents.first()
+                        Text(
+                            buildDescriptionString(constituent.role, constituent.name),
+                            modifier = Modifier
+                                .sharedBounds(
+                                    rememberSharedContentState(
+                                        SharedKey(uiState.id, SharedElementType.Creator)
+                                    ),
+                                    animatedVisibilityScope,
+                                )
+                        )
+                    } else {
+                        for (constituent in uiState.constituents) {
+                            Text(buildDescriptionString(constituent.role, constituent.name))
+                        }
+                    }
+                    // Period
+                    uiState.period?.let { period ->
+                        Text(
+                            buildDescriptionString(stringResource(R.string.period), period),
+                            modifier = Modifier
+                                .sharedBounds(
+                                    rememberSharedContentState(
+                                        SharedKey(uiState.id, SharedElementType.Period)
+                                    ),
+                                    animatedVisibilityScope,
+                                )
+                        )
+                    }
+                    // Date
+                    uiState.date?.let { date ->
+                        Text(
+                            buildDescriptionString(stringResource(R.string.date), date),
+                            modifier = Modifier
+                                .sharedBounds(
+                                    rememberSharedContentState(
+                                        SharedKey(uiState.id, SharedElementType.Date)
+                                    ),
+                                    animatedVisibilityScope,
+                                )
+                        )
+                    }
+                    // Culture
+                    uiState.culture?.let { culture ->
+                        Text(
+                            buildDescriptionString(
+                                stringResource(R.string.culture),
+                                culture,
+                            ),
+                            modifier = Modifier
+                                .sharedBounds(
+                                    rememberSharedContentState(
+                                        SharedKey(uiState.id, SharedElementType.Culture)
+                                    ),
+                                    animatedVisibilityScope,
+                                )
+                        )
+                    }
+                    // Medium
+                    uiState.medium?.let { medium ->
+                        Text(
+                            buildDescriptionString(stringResource(R.string.medium), medium),
+                            modifier = Modifier
+                                .sharedBounds(
+                                    rememberSharedContentState(
+                                        SharedKey(uiState.id, SharedElementType.Medium)
+                                    ),
+                                    animatedVisibilityScope,
+                                )
+                        )
+                    }
+                    // Geography
+                    uiState.geography?.let { geography ->
+                        Text(buildDescriptionString(stringResource(R.string.geography), geography))
+                    }
+                    // Classification
+                    uiState.classification?.let { classification ->
+                        Text(
+                            buildDescriptionString(
+                                stringResource(R.string.classification),
+                                classification,
+                            ),
+                        )
+                    }
+                    // Department
+                    uiState.department?.let { department ->
+                        Text(
+                            buildDescriptionString(stringResource(R.string.department), department),
+                        )
+                    }
                 }
             }
         }

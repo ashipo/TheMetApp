@@ -1,6 +1,16 @@
+@file:OptIn(ExperimentalSharedTransitionApi::class)
+
 package com.ashipo.metropolitanmuseum.ui.searchresult
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.SharedTransitionScope.ResizeMode.Companion.RemeasureToBounds
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -72,10 +82,14 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.ashipo.metropolitanmuseum.R
+import com.ashipo.metropolitanmuseum.ui.LocalAnimatedVisibilityScope
+import com.ashipo.metropolitanmuseum.ui.LocalSharedTransitionScope
 import com.ashipo.metropolitanmuseum.ui.model.Artwork
 import com.ashipo.metropolitanmuseum.ui.model.ArtworkImage
 import com.ashipo.metropolitanmuseum.ui.model.ArtworkInfo
 import com.ashipo.metropolitanmuseum.ui.model.Constituent
+import com.ashipo.metropolitanmuseum.ui.util.SharedElementType
+import com.ashipo.metropolitanmuseum.ui.util.SharedKey
 import com.ashipo.metropolitanmuseum.ui.util.openUrl
 import com.github.panpf.sketch.AsyncImage
 import com.github.panpf.sketch.rememberAsyncImageState
@@ -94,26 +108,46 @@ fun SearchResultScreen(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    val titleString = when (uiState) {
-                        SearchResultUiState.Error -> stringResource(R.string.error)
-                        SearchResultUiState.Loading -> stringResource(R.string.loading)
-                        is SearchResultUiState.Success -> stringResource(R.string.found_template)
-                            .format(uiState.total)
-                    }
-                    Text(titleString)
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = { onAction(SearchResultScreenAction.GoBack) },
-                        modifier = Modifier.testTag("navigateBack"),
-                    ) {
-                        Icon(Icons.AutoMirrored.Default.ArrowBack, stringResource(R.string.back))
-                    }
-                },
-                scrollBehavior = scrollBehavior,
-            )
+            val sharedTransitionScope = LocalSharedTransitionScope.current
+                ?: throw IllegalStateException("No SharedTransitionScope found")
+            val animatedVisibilityScope = LocalAnimatedVisibilityScope.current
+                ?: throw IllegalStateException("No AnimatedVisibilityScope found")
+            with(sharedTransitionScope) {
+                with(animatedVisibilityScope) {
+                    TopAppBar(
+                        title = {
+                            val titleString = when (uiState) {
+                                SearchResultUiState.Error -> stringResource(R.string.error)
+                                SearchResultUiState.Loading -> stringResource(R.string.loading)
+                                is SearchResultUiState.Success -> stringResource(R.string.found_template)
+                                    .format(uiState.total)
+                            }
+                            Text(titleString)
+                        },
+                        navigationIcon = {
+                            IconButton(
+                                onClick = { onAction(SearchResultScreenAction.GoBack) },
+                                modifier = Modifier.testTag("navigateBack"),
+                            ) {
+                                Icon(
+                                    Icons.AutoMirrored.Default.ArrowBack,
+                                    stringResource(R.string.back)
+                                )
+                            }
+                        },
+                        scrollBehavior = scrollBehavior,
+                        modifier = Modifier
+                            .renderInSharedTransitionScopeOverlay(
+                                zIndexInOverlay = 1f
+                            )
+                            .animateEnterExit(
+                                slideInVertically() + fadeIn(),
+                                slideOutVertically() + fadeOut(),
+                                "SearchResultScreen TopBar EnterExit"
+                            )
+                    )
+                }
+            }
         },
         modifier = modifier
             .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
@@ -158,7 +192,6 @@ fun SearchResultScreen(
                                     onOpenWebpage = {
                                         onAction(SearchResultScreenAction.OpenWebpage(artworkInfo))
                                     },
-                                    modifier = Modifier.fillMaxWidth()
                                 )
 
                                 is ArtworkInfo.NotFound -> NotFoundPlaceholder(
@@ -217,6 +250,8 @@ private val artworkSize = Modifier
     .padding(horizontal = 16.dp, vertical = 8.dp)
     .heightIn(min = 56.dp)
 
+private data class SharedField(val text: String, val key: SharedKey)
+
 @Composable
 private fun Artwork(
     artwork: Artwork,
@@ -224,9 +259,8 @@ private fun Artwork(
     onOpenWebpage: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val title = artwork.title
     val variousCreators = stringResource(R.string.various_creators)
-    val secondaryInfo = remember(artwork) {
+    val secondaryFields = remember(artwork) {
         buildList {
             if (artwork.constituents.isNotEmpty()) {
                 val creator = if (artwork.constituents.size == 1) {
@@ -234,73 +268,117 @@ private fun Artwork(
                 } else {
                     variousCreators
                 }
-                add(creator)
+                add(SharedField(creator, SharedKey(artwork.id, SharedElementType.Creator)))
             }
-            artwork.culture?.let { add(it) }
-            artwork.period?.let { add(it) }
-            artwork.date?.let { add(it) }
-            artwork.classification?.let { add(it) }
+            artwork.period?.let {
+                add(SharedField(it, SharedKey(artwork.id, SharedElementType.Period)))
+            }
+            artwork.date?.let {
+                add(SharedField(it, SharedKey(artwork.id, SharedElementType.Date)))
+            }
+            artwork.culture?.let {
+                add(SharedField(it, SharedKey(artwork.id, SharedElementType.Culture)))
+            }
+            artwork.medium?.let {
+                add(SharedField(it, SharedKey(artwork.id, SharedElementType.Medium)))
+            }
         }
     }
-    Column(modifier.testTag("artwork:${artwork.id}")) {
-        HorizontalDivider()
-        var showDetails by rememberSaveable { mutableStateOf(false) }
-        // Clickable top part with the title and a piece of additional info
+    val sharedTransitionScope = LocalSharedTransitionScope.current
+        ?: throw IllegalStateException("No SharedTransitionScope found")
+    val animatedVisibilityScope = LocalAnimatedVisibilityScope.current
+        ?: throw IllegalStateException("No AnimatedVisibilityScope found")
+    with(sharedTransitionScope) {
         Column(
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .clickable { showDetails = !showDetails }
-                .then(artworkSize)
-        ) {
-            Text(
-                text = title,
-                fontWeight = FontWeight.Bold,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis,
-            )
-            secondaryInfo.firstOrNull()?.let { text ->
-                Text(
-                    text = text,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
+            modifier = modifier
+                .testTag("artwork:${artwork.id}")
+                .sharedBounds(
+                    rememberSharedContentState(
+                        SharedKey(artwork.id, SharedElementType.Bounds)
+                    ),
+                    animatedVisibilityScope,
                 )
+        ) {
+            HorizontalDivider()
+            var showDetails by rememberSaveable { mutableStateOf(false) }
+            // Clickable top part with the title and a piece of additional info
+            Column(
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .clickable { showDetails = !showDetails }
+                    .then(artworkSize)
+            ) {
+                Text(
+                    text = artwork.title,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .sharedBounds(
+                            rememberSharedContentState(
+                                SharedKey(artwork.id, SharedElementType.Title)
+                            ),
+                            animatedVisibilityScope,
+                        )
+                )
+                secondaryFields.firstOrNull()?.let {
+                    SharedText(it, animatedVisibilityScope)
+                }
             }
-        }
-        AnimatedVisibility(showDetails) {
-            Column(Modifier.padding(horizontal = 16.dp)) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    Column(Modifier.weight(1f)) {
-                        for (i in 1..secondaryInfo.lastIndex) {
-                            Text(secondaryInfo[i])
+            // Additional fields and image
+            AnimatedVisibility(showDetails) {
+                Column(Modifier.padding(horizontal = 16.dp)) {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Column(Modifier.weight(1f)) {
+                            for (i in 1..secondaryFields.lastIndex) {
+                                SharedText(secondaryFields[i], animatedVisibilityScope)
+                            }
+                        }
+                        ArtworkPreview(artwork)
+                    }
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceAround,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                    ) {
+                        TextButton(
+                            onClick = onOpenWebpage,
+                            modifier = Modifier.testTag("openWebpage"),
+                        ) {
+                            Text(stringResource(R.string.artwork_page))
+                        }
+                        TextButton(
+                            onClick = onShowArtwork,
+                            modifier = Modifier.testTag("showArtwork"),
+                        ) {
+                            Text(stringResource(R.string.see_more))
                         }
                     }
-                    ArtworkPreview(artwork)
-                }
-                Row(
-                    horizontalArrangement = Arrangement.SpaceAround,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                ) {
-                    TextButton(
-                        onClick = onOpenWebpage,
-                        modifier = Modifier.testTag("openWebpage"),
-                    ) {
-                        Text(stringResource(R.string.artwork_page))
-                    }
-                    TextButton(
-                        onClick = onShowArtwork,
-                        modifier = Modifier.testTag("showArtwork"),
-                    ) {
-                        Text(stringResource(R.string.see_more))
-                    }
                 }
             }
         }
     }
+}
+
+@Composable
+private fun SharedTransitionScope.SharedText(
+    field: SharedField,
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    modifier: Modifier = Modifier,
+) {
+    Text(
+        text = field.text,
+        maxLines = 2,
+        overflow = TextOverflow.Ellipsis,
+        modifier = modifier.sharedBounds(
+            sharedContentState = rememberSharedContentState(field.key),
+            animatedVisibilityScope = animatedVisibilityScope,
+        )
+    )
 }
 
 private val notFoundSize = Modifier
@@ -429,13 +507,26 @@ private fun ArtworkPreview(
             }
         } else {
             val imageState = rememberAsyncImageState()
-            AsyncImage(
-                uri = artwork.images.first().previewUrl,
-                state = imageState,
-                contentDescription = stringResource(R.string.artwork_preview),
-                modifier = Modifier
-                    .fillMaxSize()
-            )
+            val sharedTransitionScope = LocalSharedTransitionScope.current
+                ?: throw IllegalStateException("No SharedTransitionScope found")
+            val animatedVisibilityScope = LocalAnimatedVisibilityScope.current
+                ?: throw IllegalStateException("No AnimatedVisibilityScope found")
+            with(sharedTransitionScope) {
+                AsyncImage(
+                    uri = artwork.images.first().previewUrl,
+                    state = imageState,
+                    contentDescription = stringResource(R.string.artwork_preview),
+                    modifier = Modifier
+                        .sharedBounds(
+                            rememberSharedContentState(
+                                SharedKey(artwork.id, SharedElementType.Image)
+                            ),
+                            animatedVisibilityScope,
+                            resizeMode = RemeasureToBounds,
+                        )
+                        .fillMaxSize()
+                )
+            }
             when (imageState.loadState) {
                 is SketchLoadState.Started -> {
                     CircularProgressIndicator(Modifier.zIndex(1f))
@@ -569,7 +660,9 @@ private fun AppendStateFooterErrorPreview() {
         appendStateFooter(
             LoadState.Error(Throwable("Error message")),
             {},
-            Modifier.fillMaxWidth().height(56.dp)
+            Modifier
+                .fillMaxWidth()
+                .height(56.dp)
         )
     }
 }
@@ -582,7 +675,9 @@ private fun AppendStateFooterLoadingPreview() {
         appendStateFooter(
             LoadState.Loading,
             {},
-            Modifier.fillMaxWidth().height(56.dp)
+            Modifier
+                .fillMaxWidth()
+                .height(56.dp)
         )
     }
 }
