@@ -3,7 +3,7 @@
 package com.ashipo.metropolitanmuseum.ui.imageviewer
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope.ResizeMode.Companion.RemeasureToBounds
+import androidx.compose.animation.SharedTransitionScope.ResizeMode
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,6 +34,8 @@ import com.ashipo.metropolitanmuseum.R
 import com.ashipo.metropolitanmuseum.ui.LocalAnimatedVisibilityScope
 import com.ashipo.metropolitanmuseum.ui.LocalSharedTransitionScope
 import com.ashipo.metropolitanmuseum.ui.model.ArtworkImage
+import com.ashipo.metropolitanmuseum.ui.util.SharedElementType
+import com.ashipo.metropolitanmuseum.ui.util.SharedKey
 import com.github.panpf.sketch.rememberAsyncImageState
 import com.github.panpf.sketch.request.ComposableImageRequest
 import com.github.panpf.sketch.request.LoadState
@@ -47,6 +49,7 @@ import com.github.panpf.zoomimage.zoom.FixedScalesCalculator
 fun ImageViewerScreen(
     images: List<ArtworkImage>,
     initialImageIndex: Int,
+    artworkId: Int,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -115,9 +118,11 @@ fun ImageViewerScreen(
                         modifier = Modifier
                             .zIndex(1f)
                             .sharedBounds(
-                                rememberSharedContentState("Image$index"),
+                                rememberSharedContentState(
+                                    SharedKey(artworkId, SharedElementType.Image, index)
+                                ),
                                 animatedVisibilityScope,
-                                resizeMode = RemeasureToBounds,
+                                resizeMode = ResizeMode.RemeasureToBounds,
                             )
                             .fillMaxSize()
                     )

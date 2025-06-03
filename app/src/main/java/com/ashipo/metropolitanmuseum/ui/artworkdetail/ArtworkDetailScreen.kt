@@ -58,6 +58,8 @@ import com.ashipo.metropolitanmuseum.ui.LocalAnimatedVisibilityScope
 import com.ashipo.metropolitanmuseum.ui.LocalSharedTransitionScope
 import com.ashipo.metropolitanmuseum.ui.model.ArtworkImage
 import com.ashipo.metropolitanmuseum.ui.model.Constituent
+import com.ashipo.metropolitanmuseum.ui.util.SharedElementType
+import com.ashipo.metropolitanmuseum.ui.util.SharedKey
 import com.ashipo.metropolitanmuseum.ui.util.buildDescriptionString
 import com.github.panpf.sketch.AsyncImage
 import com.github.panpf.sketch.rememberAsyncImageState
@@ -124,6 +126,7 @@ fun ArtworkDetailScreen(
         ) {
             if (uiState.images.isNotEmpty()) {
                 Images(
+                    id = uiState.id,
                     images = uiState.images,
                     onShowFullscreen = onShowFullscreen,
                     modifier = Modifier.fillMaxWidth(),
@@ -177,6 +180,7 @@ private val previewSize = Modifier
  */
 @Composable
 private fun Images(
+    id: Int,
     images: List<ArtworkImage>,
     onShowFullscreen: (imageIndex: Int) -> Unit,
     modifier: Modifier = Modifier,
@@ -218,7 +222,9 @@ private fun Images(
                         .testTag("image")
                         .zIndex(1f)
                         .sharedBounds(
-                            rememberSharedContentState("Image$currentImageIndex"),
+                            rememberSharedContentState(
+                                SharedKey(id, SharedElementType.Image, currentImageIndex)
+                            ),
                             animatedVisibilityScope,
                             resizeMode = RemeasureToBounds,
                         )

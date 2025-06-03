@@ -44,11 +44,12 @@ fun ArtworkDetailRoute(
     modifier: Modifier = Modifier,
     viewModel: ArtworkDetailViewModel = koinViewModel(),
 ) {
+    val uiState = viewModel.uiState
     ArtworkDetailScreen(
-        uiState = viewModel.uiState,
+        uiState = uiState,
         onNavigateBack = onNavigateUp,
         onShowFullscreen = { imageIndex ->
-            onShowFullscreen(ImageViewerParams(viewModel.uiState.images, imageIndex))
+            onShowFullscreen(ImageViewerParams(uiState.images, imageIndex, uiState.id))
         },
         modifier = modifier,
     )

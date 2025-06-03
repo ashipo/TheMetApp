@@ -44,6 +44,7 @@ fun ImageViewerRoute(
     ImageViewerScreen(
         images = params.images,
         initialImageIndex = params.initialImageIndex,
+        artworkId = params.artworkId,
         onNavigateBack = onNavigateUp,
         modifier = modifier,
     )
