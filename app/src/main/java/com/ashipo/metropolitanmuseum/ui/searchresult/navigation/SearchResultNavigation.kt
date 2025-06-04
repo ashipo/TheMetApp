@@ -1,6 +1,7 @@
 package com.ashipo.metropolitanmuseum.ui.searchresult.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -8,6 +9,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.ashipo.metropolitanmuseum.ui.LocalAnimatedVisibilityScope
 import com.ashipo.metropolitanmuseum.ui.model.Artwork
 import com.ashipo.metropolitanmuseum.ui.searchresult.SearchResultScreen
 import com.ashipo.metropolitanmuseum.ui.searchresult.SearchResultScreenAction
@@ -28,7 +30,11 @@ fun NavGraphBuilder.searchResultScreen(
     onNavigateUp: () -> Unit,
 ) {
     composable<SearchResultRoute> {
-        SearchResultRoute(onShowArtwork, onNavigateUp)
+        CompositionLocalProvider(
+            LocalAnimatedVisibilityScope provides this@composable,
+        ) {
+            SearchResultRoute(onShowArtwork, onNavigateUp)
+        }
     }
 }
 
