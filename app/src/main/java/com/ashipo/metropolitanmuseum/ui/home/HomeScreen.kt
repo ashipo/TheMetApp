@@ -38,6 +38,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.dropUnlessResumed
 import com.ashipo.metropolitanmuseum.Department
 import com.ashipo.metropolitanmuseum.R
 import com.ashipo.metropolitanmuseum.SearchPrefs
@@ -65,7 +66,7 @@ fun HomeScreen(
         mutableStateOf(TextFieldValue())
     }
 
-    val search = {
+    val search = dropUnlessResumed {
         onAction(HomeScreenAction.Search(searchQuery.text))
     }
 
