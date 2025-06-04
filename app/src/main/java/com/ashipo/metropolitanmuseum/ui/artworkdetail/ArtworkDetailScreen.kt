@@ -53,9 +53,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.compose.dropUnlessResumed
 import com.ashipo.metropolitanmuseum.R
 import com.ashipo.metropolitanmuseum.ui.LocalAnimatedVisibilityScope
 import com.ashipo.metropolitanmuseum.ui.LocalSharedTransitionScope
+import com.ashipo.metropolitanmuseum.ui.artworkdetail.ArtworkDetailScreenAction.GoBack
+import com.ashipo.metropolitanmuseum.ui.artworkdetail.ArtworkDetailScreenAction.ShowImages
 import com.ashipo.metropolitanmuseum.ui.model.ArtworkImage
 import com.ashipo.metropolitanmuseum.ui.model.Constituent
 import com.ashipo.metropolitanmuseum.ui.util.SharedElementType
@@ -71,8 +74,7 @@ import com.github.panpf.sketch.state.ThumbnailMemoryCacheStateImage
 @Composable
 fun ArtworkDetailScreen(
     uiState: ArtworkDetailScreenState,
-    onNavigateBack: () -> Unit,
-    onShowFullscreen: (imageIndex: Int) -> Unit,
+    onAction: (ArtworkDetailScreenAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -90,7 +92,7 @@ fun ArtworkDetailScreen(
                         },
                         navigationIcon = {
                             IconButton(
-                                onClick = onNavigateBack,
+                                onClick = dropUnlessResumed { onAction(GoBack) },
                                 modifier = Modifier.testTag("navigateBack")
                             ) {
                                 Icon(
@@ -140,7 +142,7 @@ fun ArtworkDetailScreen(
                     Images(
                         id = uiState.id,
                         images = uiState.images,
-                        onShowFullscreen = onShowFullscreen,
+                        onShowImages = { onAction(ShowImages(it)) },
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
@@ -269,7 +271,7 @@ private val previewSize = Modifier
 private fun Images(
     id: Int,
     images: List<ArtworkImage>,
-    onShowFullscreen: (imageIndex: Int) -> Unit,
+    onShowImages: (imageIndex: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -286,7 +288,9 @@ private fun Images(
             modifier = Modifier
                 .padding(bottom = 8.dp)
                 .height(300.dp)
-                .clickable { onShowFullscreen(currentImageIndex) }
+                .clickable(
+                    onClick = dropUnlessResumed { onShowImages(currentImageIndex) },
+                )
                 .fillMaxWidth()
         ) {
             val imageState = rememberAsyncImageState()
@@ -396,5 +400,5 @@ private fun ArtworkDetailScreenPreview() {
             ArtworkImage("o3", "l3", "p3"),
         ),
     )
-    ArtworkDetailScreen(uiState, {}, {})
+    ArtworkDetailScreen(uiState, {})
 }

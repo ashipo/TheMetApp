@@ -33,7 +33,7 @@ fun AppNavigation(
         )
         artworkDetailScreen(
             onNavigateUp = navController::navigateUp,
-            onShowFullscreen = navController::navigateToImageViewer,
+            onShowImages = navController::navigateToImageViewer,
         )
         imageViewerScreen(
             onNavigateUp = navController::navigateUp,

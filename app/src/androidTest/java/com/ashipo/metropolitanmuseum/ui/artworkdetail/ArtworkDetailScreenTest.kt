@@ -15,10 +15,11 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import com.ashipo.metropolitanmuseum.ui.LocalAnimatedVisibilityScope
 import com.ashipo.metropolitanmuseum.ui.LocalSharedTransitionScope
+import com.ashipo.metropolitanmuseum.ui.artworkdetail.ArtworkDetailScreenAction.GoBack
+import com.ashipo.metropolitanmuseum.ui.artworkdetail.ArtworkDetailScreenAction.ShowImages
 import com.ashipo.metropolitanmuseum.ui.model.ArtworkImage
 import com.ashipo.metropolitanmuseum.ui.model.Constituent
 import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -29,20 +30,19 @@ class ArtworkDetailScreenTest {
 
     @Test
     fun backButton_onClick_navigatesBack() {
-        var actual = false
+        var actualAction: ArtworkDetailScreenAction? = null
         composeTestRule.setContent {
             SharedScopes {
                 ArtworkDetailScreen(
                     ArtworkDetailScreenState(id = 1, title = "Title"),
-                    { actual = true },
-                    {},
+                    { actualAction = it },
                 )
             }
         }
 
         composeTestRule.onNodeWithTag("navigateBack").performClick()
 
-        assertTrue(actual)
+        assertEquals(GoBack, actualAction)
     }
 
     @Test
@@ -66,7 +66,7 @@ class ArtworkDetailScreenTest {
 
         composeTestRule.setContent {
             SharedScopes {
-                ArtworkDetailScreen(state, {}, {})
+                ArtworkDetailScreen(state, {})
             }
         }
 
@@ -99,7 +99,7 @@ class ArtworkDetailScreenTest {
         composeTestRule.setContent {
             SharedScopes {
                 ArtworkDetailScreen(
-                    ArtworkDetailScreenState(1, "Title", images = images), {}, {})
+                    ArtworkDetailScreenState(1, "Title", images = images), {})
             }
         }
 
@@ -123,11 +123,11 @@ class ArtworkDetailScreenTest {
             )
         }
         val expectedIndex = images.lastIndex
-        var actualIndex: Int? = null
+        var actualAction: ArtworkDetailScreenAction? = null
         composeTestRule.setContent {
             SharedScopes {
                 ArtworkDetailScreen(
-                    ArtworkDetailScreenState(1, "Title", images = images), {}, { actualIndex = it })
+                    ArtworkDetailScreenState(1, "Title", images = images), { actualAction = it })
             }
         }
 
@@ -141,7 +141,8 @@ class ArtworkDetailScreenTest {
             onNodeWithTag("image", true).performClick()
         }
 
-        assertEquals(expectedIndex, actualIndex)
+        assert(actualAction is ShowImages)
+        assertEquals(expectedIndex, (actualAction as ShowImages).initialImageIndex)
     }
 }
 

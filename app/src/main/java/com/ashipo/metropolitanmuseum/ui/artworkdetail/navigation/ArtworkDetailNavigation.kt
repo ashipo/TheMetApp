@@ -8,6 +8,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.ashipo.metropolitanmuseum.ui.LocalAnimatedVisibilityScope
 import com.ashipo.metropolitanmuseum.ui.artworkdetail.ArtworkDetailScreen
+import com.ashipo.metropolitanmuseum.ui.artworkdetail.ArtworkDetailScreenAction.GoBack
+import com.ashipo.metropolitanmuseum.ui.artworkdetail.ArtworkDetailScreenAction.ShowImages
 import com.ashipo.metropolitanmuseum.ui.artworkdetail.ArtworkDetailViewModel
 import com.ashipo.metropolitanmuseum.ui.model.Artwork
 import com.ashipo.metropolitanmuseum.ui.model.ImageViewerParams
@@ -23,7 +25,7 @@ fun NavController.navigateToArtworkDetail(artwork: Artwork) {
 }
 
 fun NavGraphBuilder.artworkDetailScreen(
-    onShowFullscreen: (ImageViewerParams) -> Unit,
+    onShowImages: (ImageViewerParams) -> Unit,
     onNavigateUp: () -> Unit,
 ) {
     composable<ArtworkDetailRoute>(
@@ -32,14 +34,14 @@ fun NavGraphBuilder.artworkDetailScreen(
         CompositionLocalProvider(
             LocalAnimatedVisibilityScope provides this@composable,
         ) {
-            ArtworkDetailRoute(onShowFullscreen, onNavigateUp)
+            ArtworkDetailRoute(onShowImages, onNavigateUp)
         }
     }
 }
 
 @Composable
 fun ArtworkDetailRoute(
-    onShowFullscreen: (ImageViewerParams) -> Unit,
+    onShowImages: (ImageViewerParams) -> Unit,
     onNavigateUp: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ArtworkDetailViewModel = koinViewModel(),
@@ -47,9 +49,13 @@ fun ArtworkDetailRoute(
     val uiState = viewModel.uiState
     ArtworkDetailScreen(
         uiState = uiState,
-        onNavigateBack = onNavigateUp,
-        onShowFullscreen = { imageIndex ->
-            onShowFullscreen(ImageViewerParams(uiState.images, imageIndex, uiState.id))
+        onAction = { action ->
+            when (action) {
+                is GoBack -> onNavigateUp()
+                is ShowImages -> onShowImages(
+                    ImageViewerParams(uiState.images, action.initialImageIndex, uiState.id),
+                )
+            }
         },
         modifier = modifier,
     )
