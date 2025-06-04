@@ -77,6 +77,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
@@ -128,7 +129,9 @@ fun SearchResultScreen(
                         },
                         navigationIcon = {
                             IconButton(
-                                onClick = { onAction(SearchResultScreenAction.GoBack) },
+                                onClick = dropUnlessResumed {
+                                    onAction(SearchResultScreenAction.GoBack)
+                                },
                                 modifier = Modifier.testTag("navigateBack"),
                             ) {
                                 Icon(
@@ -188,7 +191,7 @@ fun SearchResultScreen(
                             when (artworkInfo) {
                                 is Artwork -> Artwork(
                                     artwork = artworkInfo,
-                                    onShowArtwork = {
+                                    onShowArtwork = dropUnlessResumed {
                                         onAction(SearchResultScreenAction.ShowArtwork(artworkInfo))
                                     },
                                     onOpenWebpage = {

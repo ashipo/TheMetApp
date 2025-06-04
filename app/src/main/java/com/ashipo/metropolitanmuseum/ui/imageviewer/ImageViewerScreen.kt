@@ -30,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.compose.dropUnlessResumed
 import com.ashipo.metropolitanmuseum.R
 import com.ashipo.metropolitanmuseum.ui.LocalAnimatedVisibilityScope
 import com.ashipo.metropolitanmuseum.ui.LocalSharedTransitionScope
@@ -61,7 +62,7 @@ fun ImageViewerScreen(
         with(sharedTransitionScope) {
             with(animatedVisibilityScope) {
                 FilledTonalIconButton(
-                    onClick = onNavigateBack,
+                    onClick = dropUnlessResumed { onNavigateBack() },
                     modifier = Modifier
                         .zIndex(1f)
                         .align(Alignment.TopEnd)
