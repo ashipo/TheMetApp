@@ -10,6 +10,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.testing.asPagingSourceFactory
 import com.ashipo.metropolitanmuseum.data.network.PAGE_SIZE
+import com.ashipo.metropolitanmuseum.ui.SharedScopes
 import com.ashipo.metropolitanmuseum.ui.model.Artwork
 import com.ashipo.metropolitanmuseum.ui.model.ArtworkInfo
 import junit.framework.TestCase.assertEquals
@@ -38,12 +39,14 @@ class SearchResultScreenTest {
     fun backButton_onClick_executesGoBackAction() {
         var actual: SearchResultScreenAction? = null
         composeTestRule.setContent {
-            val items = items.collectAsLazyPagingItems()
-            SearchResultScreen(
-                SearchResultUiState.Error,
-                pagingArtworks = items,
-                onAction = { actual = it },
-            )
+            SharedScopes {
+                val items = items.collectAsLazyPagingItems()
+                SearchResultScreen(
+                    SearchResultUiState.Error,
+                    pagingArtworks = items,
+                    onAction = { actual = it },
+                )
+            }
         }
 
         composeTestRule.onNodeWithTag("navigateBack").performClick()
@@ -56,12 +59,14 @@ class SearchResultScreenTest {
         val artwork = artworks[1]
         var actual: SearchResultScreenAction? = null
         composeTestRule.setContent {
-            val items = items.collectAsLazyPagingItems()
-            SearchResultScreen(
-                SearchResultUiState.Success(artworks.size),
-                pagingArtworks = items,
-                onAction = { actual = it },
-            )
+            SharedScopes {
+                val items = items.collectAsLazyPagingItems()
+                SearchResultScreen(
+                    SearchResultUiState.Success(artworks.size),
+                    pagingArtworks = items,
+                    onAction = { actual = it },
+                )
+            }
         }
 
         composeTestRule.apply {
@@ -77,12 +82,14 @@ class SearchResultScreenTest {
         val artwork = artworks[1]
         var actual: SearchResultScreenAction? = null
         composeTestRule.setContent {
-            val items = items.collectAsLazyPagingItems()
-            SearchResultScreen(
-                SearchResultUiState.Success(artworks.size),
-                pagingArtworks = items,
-                onAction = { actual = it },
-            )
+            SharedScopes {
+                val items = items.collectAsLazyPagingItems()
+                SearchResultScreen(
+                    SearchResultUiState.Success(artworks.size),
+                    pagingArtworks = items,
+                    onAction = { actual = it },
+                )
+            }
         }
 
         composeTestRule.apply {
@@ -96,12 +103,14 @@ class SearchResultScreenTest {
     @Test
     fun artworks_displayTitle() {
         composeTestRule.setContent {
-            val items = items.collectAsLazyPagingItems()
-            SearchResultScreen(
-                uiState = SearchResultUiState.Success(artworks.size),
-                pagingArtworks = items,
-                onAction = {},
-            )
+            SharedScopes {
+                val items = items.collectAsLazyPagingItems()
+                SearchResultScreen(
+                    uiState = SearchResultUiState.Success(artworks.size),
+                    pagingArtworks = items,
+                    onAction = {},
+                )
+            }
         }
 
         composeTestRule.onNodeWithText(artworks[0].title, true).assertIsDisplayed()

@@ -2,19 +2,14 @@
 
 package com.ashipo.metropolitanmuseum.ui.artworkdetail
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
-import com.ashipo.metropolitanmuseum.ui.LocalAnimatedVisibilityScope
-import com.ashipo.metropolitanmuseum.ui.LocalSharedTransitionScope
+import com.ashipo.metropolitanmuseum.ui.SharedScopes
 import com.ashipo.metropolitanmuseum.ui.artworkdetail.ArtworkDetailScreenAction.GoBack
 import com.ashipo.metropolitanmuseum.ui.artworkdetail.ArtworkDetailScreenAction.ShowImages
 import com.ashipo.metropolitanmuseum.ui.model.ArtworkImage
@@ -29,7 +24,7 @@ class ArtworkDetailScreenTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun backButton_onClick_navigatesBack() {
+    fun backButton_onClick_executesGoBackAction() {
         var actualAction: ArtworkDetailScreenAction? = null
         composeTestRule.setContent {
             SharedScopes {
@@ -114,7 +109,7 @@ class ArtworkDetailScreenTest {
     }
 
     @Test
-    fun mainImage_onClick_displaysFullScreen() {
+    fun mainImage_onClick_executesShowImagesAction() {
         val images = List(10) { i ->
             ArtworkImage(
                 originalUrl = "https://example.com/image_$i.jpg",
@@ -143,18 +138,5 @@ class ArtworkDetailScreenTest {
 
         assert(actualAction is ShowImages)
         assertEquals(expectedIndex, (actualAction as ShowImages).initialImageIndex)
-    }
-}
-
-@Composable
-private fun SharedScopes(content: @Composable () -> Unit) {
-    SharedTransitionLayout {
-        CompositionLocalProvider(LocalSharedTransitionScope provides this) {
-            AnimatedVisibility(true) {
-                CompositionLocalProvider(LocalAnimatedVisibilityScope provides this) {
-                    content()
-                }
-            }
-        }
     }
 }
