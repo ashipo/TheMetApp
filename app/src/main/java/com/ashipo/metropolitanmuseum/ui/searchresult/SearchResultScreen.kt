@@ -69,6 +69,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -90,6 +91,7 @@ import com.ashipo.metropolitanmuseum.ui.model.ArtworkInfo
 import com.ashipo.metropolitanmuseum.ui.model.Constituent
 import com.ashipo.metropolitanmuseum.ui.util.SharedElementType
 import com.ashipo.metropolitanmuseum.ui.util.SharedKey
+import com.ashipo.metropolitanmuseum.ui.util.buildDescriptionString
 import com.ashipo.metropolitanmuseum.ui.util.openUrl
 import com.github.panpf.sketch.AsyncImage
 import com.github.panpf.sketch.rememberAsyncImageState
@@ -250,7 +252,7 @@ private val artworkSize = Modifier
     .padding(horizontal = 16.dp, vertical = 8.dp)
     .heightIn(min = 56.dp)
 
-private data class SharedField(val text: String, val key: SharedKey)
+private data class SharedField(val text: AnnotatedString, val key: SharedKey)
 
 @Composable
 private fun Artwork(
@@ -259,28 +261,43 @@ private fun Artwork(
     onOpenWebpage: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val variousCreators = stringResource(R.string.various_creators)
+    val maker = stringResource(R.string.maker)
+    val various = stringResource(R.string.various)
+    val periodLabel = stringResource(R.string.period)
+    val dateLabel = stringResource(R.string.date)
+    val cultureLabel = stringResource(R.string.culture)
+    val mediumLabel = stringResource(R.string.medium)
     val secondaryFields = remember(artwork) {
         buildList {
             if (artwork.constituents.isNotEmpty()) {
-                val creator = if (artwork.constituents.size == 1) {
-                    artwork.constituents.first().name
+                val text = if (artwork.constituents.size == 1) {
+                    val maker = artwork.constituents.first()
+                    buildDescriptionString(maker.role, maker.name)
                 } else {
-                    variousCreators
+                    buildDescriptionString(maker, various)
                 }
-                add(SharedField(creator, SharedKey(artwork.id, SharedElementType.Creator)))
+                val key = SharedKey(artwork.id, SharedElementType.Creator)
+                add(SharedField(text, key))
             }
             artwork.period?.let {
-                add(SharedField(it, SharedKey(artwork.id, SharedElementType.Period)))
+                val text = buildDescriptionString(periodLabel, it)
+                val key = SharedKey(artwork.id, SharedElementType.Period)
+                add(SharedField(text, key))
             }
             artwork.date?.let {
-                add(SharedField(it, SharedKey(artwork.id, SharedElementType.Date)))
+                val text = buildDescriptionString(dateLabel, it)
+                val key = SharedKey(artwork.id, SharedElementType.Date)
+                add(SharedField(text, key))
             }
             artwork.culture?.let {
-                add(SharedField(it, SharedKey(artwork.id, SharedElementType.Culture)))
+                val text = buildDescriptionString(cultureLabel, it)
+                val key = SharedKey(artwork.id, SharedElementType.Culture)
+                add(SharedField(text, key))
             }
             artwork.medium?.let {
-                add(SharedField(it, SharedKey(artwork.id, SharedElementType.Medium)))
+                val text = buildDescriptionString(mediumLabel, it)
+                val key = SharedKey(artwork.id, SharedElementType.Medium)
+                add(SharedField(text, key))
             }
         }
     }

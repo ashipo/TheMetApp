@@ -135,6 +135,7 @@ fun ArtworkDetailScreen(
                     )
                     .fillMaxSize()
             ) {
+                // Images
                 if (uiState.images.isNotEmpty()) {
                     Images(
                         id = uiState.id,
@@ -150,7 +151,8 @@ fun ArtworkDetailScreen(
                 ) {
                     // Title
                     Text(
-                        buildDescriptionString(stringResource(R.string.title), uiState.title),
+                        text = uiState.title,
+                        style = MaterialTheme.typography.headlineSmall,
                         modifier = Modifier
                             .sharedBounds(
                                 rememberSharedContentState(
