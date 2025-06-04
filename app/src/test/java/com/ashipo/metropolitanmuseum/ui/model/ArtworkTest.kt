@@ -142,7 +142,8 @@ class ArtworkTest {
         fun `Artwork_images - backed up by images-related NetworkArtwork fields`() {
             val primaryImage =
                 "https://images.metmuseum.org/CRDImages/gr/original/DP-18928-001.jpg"
-            val primaryImagePreview = getPreviewImageUrl(primaryImage)
+            val primaryImagePreview =
+                "https://images.metmuseum.org/CRDImages/gr/web-large/DP-18928-001.jpg"
             val additionalImages = listOf(
                 "https://images.metmuseum.org/CRDImages/gr/original/DP-18928-002.jpg",
                 "https://images.metmuseum.org/CRDImages/gr/original/DP-18928-003.jpg",

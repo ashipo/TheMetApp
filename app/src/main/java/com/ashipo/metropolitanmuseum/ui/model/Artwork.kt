@@ -103,7 +103,7 @@ private fun NetworkArtwork.getImages(): List<ArtworkImage> {
     }
     val images = mutableListOf<ArtworkImage>()
     val primaryLarge = getLargeImageUrl(primaryImageUrl)
-    val primaryPreview = primaryImagePreviewUrl
+    val primaryPreview = getPreviewImageUrl(primaryImageUrl)
     images.add(ArtworkImage(primaryImageUrl, primaryLarge, primaryPreview))
 
     if (additionalImagesUrls.isNullOrEmpty()) {
