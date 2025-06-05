@@ -13,6 +13,7 @@ import com.ashipo.metropolitanmuseum.data.network.PAGE_SIZE
 import com.ashipo.metropolitanmuseum.ui.SharedScopes
 import com.ashipo.metropolitanmuseum.ui.model.Artwork
 import com.ashipo.metropolitanmuseum.ui.model.ArtworkInfo
+import com.ashipo.metropolitanmuseum.ui.model.Constituent
 import junit.framework.TestCase.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -114,5 +115,74 @@ class SearchResultScreenTest {
         }
 
         composeTestRule.onNodeWithText(artworks[0].title, true).assertIsDisplayed()
+    }
+
+    @Test
+    fun artworkTitle_htmlIsConverted() {
+        val artworks = listOf(
+            Artwork(
+                id = 1,
+                title = "Artwork&#39;s <i>Italic</i>",
+            )
+        )
+        val items = Pager(
+            config = PagingConfig(pageSize = PAGE_SIZE),
+            pagingSourceFactory = (artworks as List<ArtworkInfo>).asPagingSourceFactory(),
+        ).flow
+
+        composeTestRule.setContent {
+            SharedScopes {
+                val items = items.collectAsLazyPagingItems()
+                SearchResultScreen(
+                    uiState = SearchResultUiState.Success(artworks.size),
+                    pagingArtworks = items,
+                    onAction = {},
+                )
+            }
+        }
+
+        composeTestRule.apply {
+            onNodeWithText("Italic", true).assertExists()
+            onNodeWithText("'", true).assertExists()
+            onNodeWithText("&#39;", true).assertDoesNotExist()
+            onNodeWithText("<i>", true).assertDoesNotExist()
+        }
+    }
+
+    @Test
+    fun artworkConstituents_htmlIsConverted() {
+        val artworks = listOf(
+            Artwork(
+                id = 1,
+                title = "Title",
+                constituents = listOf(Constituent("Artist", "<b>Mr.</b>.&#x20AC;")),
+            )
+        )
+        val items = Pager(
+            config = PagingConfig(pageSize = PAGE_SIZE),
+            pagingSourceFactory = (artworks as List<ArtworkInfo>).asPagingSourceFactory(),
+        ).flow
+
+        composeTestRule.setContent {
+            SharedScopes {
+                val items = items.collectAsLazyPagingItems()
+                SearchResultScreen(
+                    uiState = SearchResultUiState.Success(artworks.size),
+                    pagingArtworks = items,
+                    onAction = {},
+                )
+            }
+        }
+
+        composeTestRule.apply {
+            onNodeWithTag("artwork:1").performClick()
+        }
+
+        composeTestRule.apply {
+            onNodeWithText("Mr.", true).assertExists()
+            onNodeWithText("€", true).assertExists()
+            onNodeWithText("&#x20AC;", true).assertDoesNotExist()
+            onNodeWithText("<b>", true).assertDoesNotExist()
+        }
     }
 }

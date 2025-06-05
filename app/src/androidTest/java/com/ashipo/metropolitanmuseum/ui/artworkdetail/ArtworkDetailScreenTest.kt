@@ -139,4 +139,46 @@ class ArtworkDetailScreenTest {
         assert(actualAction is ShowImages)
         assertEquals(expectedIndex, (actualAction as ShowImages).initialImageIndex)
     }
+
+    @Test
+    fun title_htmlIsConverted() {
+        composeTestRule.setContent {
+            SharedScopes {
+                ArtworkDetailScreen(
+                    ArtworkDetailScreenState(1, "Artwork&#39;s <i>Italic</i>"),
+                    {},
+                )
+            }
+        }
+
+        composeTestRule.apply {
+            onNodeWithText("Italic", true).assertExists()
+            onNodeWithText("'", true).assertExists()
+            onNodeWithText("&#39;", true).assertDoesNotExist()
+            onNodeWithText("<i>", true).assertDoesNotExist()
+        }
+    }
+
+    @Test
+    fun constituents_htmlIsConverted() {
+        composeTestRule.setContent {
+            SharedScopes {
+                ArtworkDetailScreen(
+                    ArtworkDetailScreenState(
+                        id = 1,
+                        title = "title",
+                        constituents = listOf(Constituent("Artist", "<b>Mr.</b>.&#x20AC;")),
+                    ),
+                    {},
+                )
+            }
+        }
+
+        composeTestRule.apply {
+            onNodeWithText("Mr.", true).assertExists()
+            onNodeWithText("€", true).assertExists()
+            onNodeWithText("&#x20AC;", true).assertDoesNotExist()
+            onNodeWithText("<b>", true).assertDoesNotExist()
+        }
+    }
 }

@@ -7,6 +7,8 @@ import kotlinx.serialization.Serializable
 
 /**
  * Domain Artwork object. Nullable fields should be either null or non-blank.
+ *
+ * @param title may contain HTML tags
  */
 @Serializable
 data class Artwork(
