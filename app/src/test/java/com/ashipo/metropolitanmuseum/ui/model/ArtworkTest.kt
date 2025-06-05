@@ -13,11 +13,11 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-@DisplayName("Artwork")
+@DisplayName("NetworkArtwork")
 class ArtworkTest {
 
     @Nested
-    @DisplayName("NetworkArtwork.toLocal()")
+    @DisplayName("toLocal()")
     inner class ToLocal {
 
         @Test
@@ -171,6 +171,41 @@ class ArtworkTest {
                         )
                     )
                 }
+            }
+
+            val actual = networkArtwork.toLocal().images
+
+            assertEquals(expected, actual)
+        }
+
+        @Test
+        @DisplayName("Artwork.images - when NetworkArtwork has duplicate images - does not contain duplicates")
+        fun `Artwork_images - does not contain duplicates`() {
+            // https://images.metmuseum.org/CRDImages/gr/original/DP-00[1 - 3].jpg
+            val primaryImage =
+                "https://images.metmuseum.org/CRDImages/gr/original/DP-001.jpg"
+            val primaryImagePreview =
+                "https://images.metmuseum.org/CRDImages/gr/web-large/DP-001.jpg"
+            val additionalImages = listOf(
+                "https://images.metmuseum.org/CRDImages/gr/original/DP-002.jpg",
+                "https://images.metmuseum.org/CRDImages/gr/original/DP-003.jpg",
+                "https://images.metmuseum.org/CRDImages/gr/original/DP-001.jpg",
+                "https://images.metmuseum.org/CRDImages/gr/original/DP-003.jpg",
+            )
+            val networkArtwork = NetworkArtwork(
+                id = 1,
+                primaryImageUrl = primaryImage,
+                primaryImagePreviewUrl = primaryImagePreview,
+                additionalImagesUrls = additionalImages,
+            )
+            val expected = List(3) { index ->
+                val original =
+                    "https://images.metmuseum.org/CRDImages/gr/original/DP-00${index + 1}.jpg"
+                ArtworkImage(
+                    original,
+                    getLargeImageUrl(original),
+                    getPreviewImageUrl(original),
+                )
             }
 
             val actual = networkArtwork.toLocal().images

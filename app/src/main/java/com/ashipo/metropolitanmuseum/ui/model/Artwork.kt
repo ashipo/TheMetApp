@@ -97,22 +97,27 @@ private fun NetworkArtwork.getGeography(): String? {
 private fun NetworkArtwork.getTags() =
     tags?.map { it.term } ?: emptyList()
 
+/**
+ * Convert [NetworkArtwork.primaryImageUrl] and [NetworkArtwork.additionalImagesUrls] into a
+ * list of [ArtworkImage].
+ * Removes duplicates.
+ */
 private fun NetworkArtwork.getImages(): List<ArtworkImage> {
     if (primaryImageUrl.isBlank()) {
         return emptyList()
     }
-    val images = mutableListOf<ArtworkImage>()
-    val primaryLarge = getLargeImageUrl(primaryImageUrl)
-    val primaryPreview = getPreviewImageUrl(primaryImageUrl)
-    images.add(ArtworkImage(primaryImageUrl, primaryLarge, primaryPreview))
 
-    if (additionalImagesUrls.isNullOrEmpty()) {
-        return images
+    val originals = LinkedHashSet<String>()
+    originals.add(primaryImageUrl)
+    additionalImagesUrls?.let {
+        originals.addAll(it)
     }
-    for (original in additionalImagesUrls) {
-        val preview = getPreviewImageUrl(original)
+
+    val result = mutableListOf<ArtworkImage>()
+    originals.forEach { original ->
         val large = getLargeImageUrl(original)
-        images.add(ArtworkImage(original, large, preview))
+        val preview = getPreviewImageUrl(original)
+        result.add(ArtworkImage(original, large, preview))
     }
-    return images
+    return result
 }
