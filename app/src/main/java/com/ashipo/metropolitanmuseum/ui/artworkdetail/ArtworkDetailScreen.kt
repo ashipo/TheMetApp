@@ -48,6 +48,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -152,7 +154,7 @@ fun ArtworkDetailScreen(
                 ) {
                     // Title
                     Text(
-                        text = uiState.title,
+                        text = AnnotatedString.fromHtml(uiState.title),
                         style = MaterialTheme.typography.headlineSmall,
                         modifier = Modifier
                             .sharedBounds(
@@ -166,7 +168,7 @@ fun ArtworkDetailScreen(
                     if (uiState.constituents.size == 1) {
                         val constituent = uiState.constituents.first()
                         Text(
-                            buildDescriptionString(constituent.role, constituent.name),
+                            buildDescriptionString(constituent.role, constituent.name, true),
                             modifier = Modifier
                                 .sharedBounds(
                                     rememberSharedContentState(
@@ -177,7 +179,7 @@ fun ArtworkDetailScreen(
                         )
                     } else {
                         for (constituent in uiState.constituents) {
-                            Text(buildDescriptionString(constituent.role, constituent.name))
+                            Text(buildDescriptionString(constituent.role, constituent.name, true))
                         }
                     }
                     // Period

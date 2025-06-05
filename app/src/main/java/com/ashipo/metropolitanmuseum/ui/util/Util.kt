@@ -7,6 +7,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.withStyle
 import androidx.core.net.toUri
 
@@ -24,12 +25,20 @@ fun openUrl(url: String, context: Context) {
     }
 }
 
-fun buildDescriptionString(label: String, value: String): AnnotatedString {
+fun buildDescriptionString(
+    label: String,
+    value: String,
+    convertHtml: Boolean = false,
+): AnnotatedString {
     return buildAnnotatedString {
         withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
             append(label)
             append(": ")
         }
-        append(value)
+        if (convertHtml) {
+            append(AnnotatedString.fromHtml(value))
+        } else {
+            append(value)
+        }
     }
 }

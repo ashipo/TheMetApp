@@ -72,6 +72,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -275,7 +276,7 @@ private fun Artwork(
             if (artwork.constituents.isNotEmpty()) {
                 val text = if (artwork.constituents.size == 1) {
                     val maker = artwork.constituents.first()
-                    buildDescriptionString(maker.role, maker.name)
+                    buildDescriptionString(maker.role, maker.name, true)
                 } else {
                     buildDescriptionString(maker, various)
                 }
@@ -329,7 +330,7 @@ private fun Artwork(
                     .then(artworkSize)
             ) {
                 Text(
-                    text = artwork.title,
+                    text = AnnotatedString.fromHtml(artwork.title),
                     fontWeight = FontWeight.Bold,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
