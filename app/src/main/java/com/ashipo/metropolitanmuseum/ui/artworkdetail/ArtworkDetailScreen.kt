@@ -45,7 +45,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -321,30 +320,38 @@ private fun Images(
                         )
                         .fillMaxSize()
                 )
-            }
-            when (imageState.loadState) {
-                is LoadState.Started -> {
-                    CircularProgressIndicator()
-                }
-
-                is LoadState.Error -> {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .background(Color(0x7F000000))
-                            .fillMaxSize()
-                            .clickable { imageState.restart() }
-                            .zIndex(2f)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.reload_failed_image),
-                            textAlign = TextAlign.Center,
-                        )
+                when (imageState.loadState) {
+                    is LoadState.Started -> {
+                        CircularProgressIndicator()
                     }
-                }
 
-                // Success, Canceled, null
-                else -> {}
+                    is LoadState.Error -> {
+                        with(animatedVisibilityScope) {
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier
+                                    .clickable { imageState.restart() }
+                                    .zIndex(2f)
+                                    .renderInSharedTransitionScopeOverlay(
+                                        zIndexInOverlay = 1f
+                                    )
+                                    .animateEnterExit(
+                                        label = "ArtworkDetailScreen reload image EnterExit"
+                                    )
+                                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
+                                    .fillMaxSize()
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.reload_failed_image),
+                                    textAlign = TextAlign.Center,
+                                )
+                            }
+                        }
+                    }
+
+                    // Success, Canceled, null
+                    else -> {}
+                }
             }
         }
         LazyRow(
