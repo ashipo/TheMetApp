@@ -94,6 +94,7 @@ import com.ashipo.metropolitanmuseum.ui.model.ArtworkInfo
 import com.ashipo.metropolitanmuseum.ui.model.Constituent
 import com.ashipo.metropolitanmuseum.ui.util.SharedElementType
 import com.ashipo.metropolitanmuseum.ui.util.SharedKey
+import com.ashipo.metropolitanmuseum.ui.util.SharedScopes
 import com.ashipo.metropolitanmuseum.ui.util.buildDescriptionString
 import com.ashipo.metropolitanmuseum.ui.util.openUrl
 import com.github.panpf.sketch.AsyncImage
@@ -166,6 +167,13 @@ fun SearchResultScreen(
             .consumeWindowInsets(innerPadding)
 
         var detailedItemId by rememberSaveable { mutableIntStateOf(-1) }
+        val toggleDetailed: (Int) -> Unit = { toggledId ->
+            detailedItemId = if (detailedItemId == toggledId) {
+                -1
+            } else {
+                toggledId
+            }
+        }
         when {
             uiState is SearchResultUiState.Loading
                     || pagingArtworks.loadState.refresh is LoadState.Loading ->
@@ -193,13 +201,7 @@ fun SearchResultScreen(
                         when (artworkInfo) {
                             is Artwork -> Artwork(
                                 artwork = artworkInfo,
-                                onToggleDetailed = {
-                                    detailedItemId = if (detailedItemId == artworkInfo.id) {
-                                        -1
-                                    } else {
-                                        artworkInfo.id
-                                    }
-                                },
+                                onToggleDetailed = { toggleDetailed(artworkInfo.id) },
                                 detailed = detailedItemId == artworkInfo.id,
                                 onShowArtwork = dropUnlessResumed {
                                     onAction(SearchResultScreenAction.ShowArtwork(artworkInfo))
@@ -210,8 +212,10 @@ fun SearchResultScreen(
                             )
 
                             is ArtworkInfo.NotFound -> NotFoundPlaceholder(
-                                artworkInfo.id,
-                                Modifier.fillMaxWidth()
+                                id = artworkInfo.id,
+                                onToggleDetailed = { toggleDetailed(artworkInfo.id) },
+                                detailed = detailedItemId == artworkInfo.id,
+                                modifier = Modifier.fillMaxWidth()
                             )
                         }
                     }
@@ -419,15 +423,16 @@ private val notFoundSize = Modifier
 @Composable
 private fun NotFoundPlaceholder(
     id: Int,
+    onToggleDetailed: () -> Unit,
+    detailed: Boolean,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier) {
         HorizontalDivider()
-        var showDetails by rememberSaveable { mutableStateOf(false) }
         Box(
             contentAlignment = Alignment.CenterStart,
             modifier = Modifier
-                .clickable { showDetails = !showDetails }
+                .clickable { onToggleDetailed() }
                 .then(notFoundSize)
         ) {
             Text(
@@ -435,7 +440,7 @@ private fun NotFoundPlaceholder(
                 fontStyle = FontStyle.Italic,
             )
         }
-        AnimatedVisibility(showDetails) {
+        AnimatedVisibility(detailed) {
             Column(Modifier.padding(horizontal = 16.dp)) {
                 Text(stringResource(R.string.not_found_desc))
                 val context = LocalContext.current
@@ -590,7 +595,9 @@ private fun ArtworkPreview(
 private fun ArtworkWithoutPreviewPreview() {
     val artwork = createArtwork(title = "Short title")
     var detailedView by remember { mutableStateOf(false) }
-    Artwork(artwork, { detailedView = !detailedView }, detailedView, {}, {})
+    SharedScopes {
+        Artwork(artwork, { detailedView = !detailedView }, detailedView, {}, {})
+    }
 }
 
 @Preview(showBackground = true)
@@ -605,7 +612,9 @@ private fun ArtworkErrorLoadingPreviewPreview() {
     )
     val artwork = createArtwork(images = images)
     var detailedView by remember { mutableStateOf(false) }
-    Artwork(artwork, { detailedView = !detailedView }, detailedView, {}, {})
+    SharedScopes {
+        Artwork(artwork, { detailedView = !detailedView }, detailedView, {}, {})
+    }
 }
 
 private fun createArtwork(
@@ -643,7 +652,8 @@ private fun createArtwork(
 @Preview(showBackground = true)
 @Composable
 private fun NotFoundPlaceholderPreview() {
-    NotFoundPlaceholder(12)
+    var detailedView by remember { mutableStateOf(false) }
+    NotFoundPlaceholder(12, { detailedView = !detailedView }, detailedView)
 }
 
 @Preview(showBackground = true)
@@ -651,11 +661,13 @@ private fun NotFoundPlaceholderPreview() {
 private fun ErrorScreenPreview() {
     val items: List<ArtworkInfo> = emptyList()
     val pagingItems = MutableStateFlow(PagingData.from(items)).collectAsLazyPagingItems()
-    SearchResultScreen(
-        uiState = SearchResultUiState.Error,
-        pagingArtworks = pagingItems,
-        onAction = {},
-    )
+    SharedScopes {
+        SearchResultScreen(
+            uiState = SearchResultUiState.Error,
+            pagingArtworks = pagingItems,
+            onAction = {},
+        )
+    }
 }
 
 @Preview(showBackground = true)
@@ -663,11 +675,13 @@ private fun ErrorScreenPreview() {
 private fun LoadingScreenPreview() {
     val items: List<ArtworkInfo> = emptyList()
     val pagingItems = MutableStateFlow(PagingData.from(items)).collectAsLazyPagingItems()
-    SearchResultScreen(
-        uiState = SearchResultUiState.Loading,
-        pagingArtworks = pagingItems,
-        onAction = {},
-    )
+    SharedScopes {
+        SearchResultScreen(
+            uiState = SearchResultUiState.Loading,
+            pagingArtworks = pagingItems,
+            onAction = {},
+        )
+    }
 }
 
 @Preview(showBackground = true)
@@ -677,11 +691,13 @@ private fun SuccessScreenPreview() {
         createArtwork(id = i, title = "Artwork №$i", culture = "Culture", date = "Date")
     }
     val pagingItems = MutableStateFlow(PagingData.from(items)).collectAsLazyPagingItems()
-    SearchResultScreen(
-        uiState = SearchResultUiState.Success(items.size),
-        pagingArtworks = pagingItems,
-        onAction = {},
-    )
+    SharedScopes {
+        SearchResultScreen(
+            uiState = SearchResultUiState.Success(items.size),
+            pagingArtworks = pagingItems,
+            onAction = {},
+        )
+    }
 }
 
 @Preview(showBackground = true)

@@ -10,10 +10,10 @@ import androidx.paging.PagingConfig
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.testing.asPagingSourceFactory
 import com.ashipo.metropolitanmuseum.data.network.PAGE_SIZE
-import com.ashipo.metropolitanmuseum.ui.SharedScopes
 import com.ashipo.metropolitanmuseum.ui.model.Artwork
 import com.ashipo.metropolitanmuseum.ui.model.ArtworkInfo
 import com.ashipo.metropolitanmuseum.ui.model.Constituent
+import com.ashipo.metropolitanmuseum.ui.util.SharedScopes
 import junit.framework.TestCase.assertEquals
 import org.junit.Rule
 import org.junit.Test
