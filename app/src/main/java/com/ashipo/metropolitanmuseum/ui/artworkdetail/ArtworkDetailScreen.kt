@@ -64,6 +64,7 @@ import com.ashipo.metropolitanmuseum.ui.model.ArtworkImage
 import com.ashipo.metropolitanmuseum.ui.model.Constituent
 import com.ashipo.metropolitanmuseum.ui.util.SharedElementType
 import com.ashipo.metropolitanmuseum.ui.util.SharedKey
+import com.ashipo.metropolitanmuseum.ui.util.SharedScopes
 import com.ashipo.metropolitanmuseum.ui.util.buildDescriptionString
 import com.github.panpf.sketch.AsyncImage
 import com.github.panpf.sketch.rememberAsyncImageState
@@ -409,5 +410,7 @@ private fun ArtworkDetailScreenPreview() {
             ArtworkImage("o3", "l3", "p3"),
         ),
     )
-    ArtworkDetailScreen(uiState, {})
+    SharedScopes {
+        ArtworkDetailScreen(uiState, {})
+    }
 }

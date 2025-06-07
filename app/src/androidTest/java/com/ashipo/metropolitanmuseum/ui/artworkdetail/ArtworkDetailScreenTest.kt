@@ -9,11 +9,11 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
-import com.ashipo.metropolitanmuseum.ui.SharedScopes
 import com.ashipo.metropolitanmuseum.ui.artworkdetail.ArtworkDetailScreenAction.GoBack
 import com.ashipo.metropolitanmuseum.ui.artworkdetail.ArtworkDetailScreenAction.ShowImages
 import com.ashipo.metropolitanmuseum.ui.model.ArtworkImage
 import com.ashipo.metropolitanmuseum.ui.model.Constituent
+import com.ashipo.metropolitanmuseum.ui.util.SharedScopes
 import junit.framework.TestCase.assertEquals
 import org.junit.Rule
 import org.junit.Test
