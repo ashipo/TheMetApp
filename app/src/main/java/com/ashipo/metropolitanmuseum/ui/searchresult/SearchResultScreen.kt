@@ -56,6 +56,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -164,6 +165,7 @@ fun SearchResultScreen(
             .padding(innerPadding)
             .consumeWindowInsets(innerPadding)
 
+        var detailedItemId by rememberSaveable { mutableIntStateOf(-1) }
         when {
             uiState is SearchResultUiState.Loading
                     || pagingArtworks.loadState.refresh is LoadState.Loading ->
@@ -187,24 +189,30 @@ fun SearchResultScreen(
                     count = pagingArtworks.itemCount,
                     key = pagingArtworks.itemKey { it.id }
                 ) { index ->
-                    Column {
-                        pagingArtworks[index]?.let { artworkInfo ->
-                            when (artworkInfo) {
-                                is Artwork -> Artwork(
-                                    artwork = artworkInfo,
-                                    onShowArtwork = dropUnlessResumed {
-                                        onAction(SearchResultScreenAction.ShowArtwork(artworkInfo))
-                                    },
-                                    onOpenWebpage = {
-                                        onAction(SearchResultScreenAction.OpenWebpage(artworkInfo))
-                                    },
-                                )
+                    pagingArtworks[index]?.let { artworkInfo ->
+                        when (artworkInfo) {
+                            is Artwork -> Artwork(
+                                artwork = artworkInfo,
+                                onToggleDetailed = {
+                                    detailedItemId = if (detailedItemId == artworkInfo.id) {
+                                        -1
+                                    } else {
+                                        artworkInfo.id
+                                    }
+                                },
+                                detailed = detailedItemId == artworkInfo.id,
+                                onShowArtwork = dropUnlessResumed {
+                                    onAction(SearchResultScreenAction.ShowArtwork(artworkInfo))
+                                },
+                                onOpenWebpage = {
+                                    onAction(SearchResultScreenAction.OpenWebpage(artworkInfo))
+                                },
+                            )
 
-                                is ArtworkInfo.NotFound -> NotFoundPlaceholder(
-                                    artworkInfo.id,
-                                    Modifier.fillMaxWidth()
-                                )
-                            }
+                            is ArtworkInfo.NotFound -> NotFoundPlaceholder(
+                                artworkInfo.id,
+                                Modifier.fillMaxWidth()
+                            )
                         }
                     }
                 }
@@ -261,6 +269,8 @@ private data class SharedField(val text: AnnotatedString, val key: SharedKey)
 @Composable
 private fun Artwork(
     artwork: Artwork,
+    onToggleDetailed: () -> Unit,
+    detailed: Boolean,
     onShowArtwork: () -> Unit,
     onOpenWebpage: () -> Unit,
     modifier: Modifier = Modifier,
@@ -321,12 +331,11 @@ private fun Artwork(
                 )
         ) {
             HorizontalDivider()
-            var showDetails by rememberSaveable { mutableStateOf(false) }
             // Clickable top part with the title and a piece of additional info
             Column(
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier
-                    .clickable { showDetails = !showDetails }
+                    .clickable { onToggleDetailed() }
                     .then(artworkSize)
             ) {
                 Text(
@@ -347,7 +356,7 @@ private fun Artwork(
                 }
             }
             // Additional fields and image
-            AnimatedVisibility(showDetails) {
+            AnimatedVisibility(detailed) {
                 Column(Modifier.padding(horizontal = 16.dp)) {
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -580,7 +589,8 @@ private fun ArtworkPreview(
 @Composable
 private fun ArtworkWithoutPreviewPreview() {
     val artwork = createArtwork(title = "Short title")
-    Artwork(artwork, {}, {})
+    var detailedView by remember { mutableStateOf(false) }
+    Artwork(artwork, { detailedView = !detailedView }, detailedView, {}, {})
 }
 
 @Preview(showBackground = true)
@@ -594,7 +604,8 @@ private fun ArtworkErrorLoadingPreviewPreview() {
         )
     )
     val artwork = createArtwork(images = images)
-    Artwork(artwork, {}, {})
+    var detailedView by remember { mutableStateOf(false) }
+    Artwork(artwork, { detailedView = !detailedView }, detailedView, {}, {})
 }
 
 private fun createArtwork(
