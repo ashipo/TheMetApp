@@ -2,6 +2,7 @@
 
 package com.ashipo.metropolitanmuseum.ui.searchresult
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -11,24 +12,26 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
@@ -36,7 +39,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -45,21 +47,17 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TooltipBox
-import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -67,9 +65,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -78,7 +76,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.dropUnlessResumed
 import androidx.paging.LoadState
 import androidx.paging.PagingData
@@ -92,16 +89,16 @@ import com.ashipo.metropolitanmuseum.ui.model.Artwork
 import com.ashipo.metropolitanmuseum.ui.model.ArtworkImage
 import com.ashipo.metropolitanmuseum.ui.model.ArtworkInfo
 import com.ashipo.metropolitanmuseum.ui.model.Constituent
+import com.ashipo.metropolitanmuseum.ui.theme.MetropolitanMuseumTheme
 import com.ashipo.metropolitanmuseum.ui.util.SharedElementType
 import com.ashipo.metropolitanmuseum.ui.util.SharedKey
 import com.ashipo.metropolitanmuseum.ui.util.SharedScopes
 import com.ashipo.metropolitanmuseum.ui.util.buildDescriptionString
 import com.ashipo.metropolitanmuseum.ui.util.openUrl
 import com.github.panpf.sketch.AsyncImage
-import com.github.panpf.sketch.rememberAsyncImageState
+import com.github.panpf.sketch.request.ComposableImageRequest
+import com.github.panpf.sketch.request.placeholder
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
-import com.github.panpf.sketch.request.LoadState as SketchLoadState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -198,25 +195,27 @@ fun SearchResultScreen(
                     key = pagingArtworks.itemKey { it.id }
                 ) { index ->
                     pagingArtworks[index]?.let { artworkInfo ->
-                        when (artworkInfo) {
-                            is Artwork -> Artwork(
-                                artwork = artworkInfo,
-                                onToggleDetailed = { toggleDetailed(artworkInfo.id) },
-                                detailed = detailedItemId == artworkInfo.id,
-                                onShowArtwork = dropUnlessResumed {
-                                    onAction(SearchResultScreenAction.ShowArtwork(artworkInfo))
-                                },
-                                onOpenWebpage = {
-                                    onAction(SearchResultScreenAction.OpenWebpage(artworkInfo))
-                                },
-                            )
+                        Column {
+                            HorizontalDivider()
+                            when (artworkInfo) {
+                                is Artwork -> Artwork(
+                                    artwork = artworkInfo,
+                                    onToggleDetailed = { toggleDetailed(artworkInfo.id) },
+                                    detailed = detailedItemId == artworkInfo.id,
+                                    onShowArtwork = dropUnlessResumed {
+                                        onAction(SearchResultScreenAction.ShowArtwork(artworkInfo))
+                                    },
+                                    onOpenWebpage = {
+                                        onAction(SearchResultScreenAction.OpenWebpage(artworkInfo))
+                                    },
+                                )
 
-                            is ArtworkInfo.NotFound -> NotFoundPlaceholder(
-                                id = artworkInfo.id,
-                                onToggleDetailed = { toggleDetailed(artworkInfo.id) },
-                                detailed = detailedItemId == artworkInfo.id,
-                                modifier = Modifier.fillMaxWidth()
-                            )
+                                is ArtworkInfo.NotFound -> NotFoundPlaceholder(
+                                    id = artworkInfo.id,
+                                    onToggleDetailed = { toggleDetailed(artworkInfo.id) },
+                                    detailed = detailedItemId == artworkInfo.id,
+                                )
+                            }
                         }
                     }
                 }
@@ -231,42 +230,6 @@ fun SearchResultScreen(
         }
     }
 }
-
-private fun LazyListScope.appendStateFooter(
-    appendState: LoadState,
-    onRetry: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    when (appendState) {
-        is LoadState.Loading -> item {
-            HorizontalDivider()
-            CircularProgressIndicator(
-                modifier = modifier.wrapContentSize(Alignment.Center)
-            )
-        }
-
-        is LoadState.Error -> item {
-            HorizontalDivider()
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = modifier.clickable(
-                    role = Role.Button,
-                    onClick = onRetry,
-                )
-            ) {
-                Text(stringResource(R.string.error_loading_artworks))
-            }
-        }
-
-        else -> Unit
-    }
-}
-
-private val artworkSize = Modifier
-    .fillMaxWidth()
-    .padding(horizontal = 16.dp, vertical = 8.dp)
-    .heightIn(min = 56.dp)
 
 private data class SharedField(val text: AnnotatedString, val key: SharedKey)
 
@@ -319,65 +282,118 @@ private fun Artwork(
             }
         }
     }
-    val sharedTransitionScope = LocalSharedTransitionScope.current
-        ?: throw IllegalStateException("No SharedTransitionScope found")
-    val animatedVisibilityScope = LocalAnimatedVisibilityScope.current
-        ?: throw IllegalStateException("No AnimatedVisibilityScope found")
-    with(sharedTransitionScope) {
-        Column(
-            modifier = modifier
-                .testTag("artwork:${artwork.id}")
-                .sharedBounds(
-                    rememberSharedContentState(
-                        SharedKey(artwork.id, SharedElementType.Bounds)
-                    ),
-                    animatedVisibilityScope,
-                )
-        ) {
-            HorizontalDivider()
-            // Clickable top part with the title and a piece of additional info
-            Column(
-                verticalArrangement = Arrangement.Center,
+    Column(
+        modifier = modifier
+            .testTag("artwork:${artwork.id}")
+    ) {
+        val sharedTransitionScope = LocalSharedTransitionScope.current
+            ?: throw IllegalStateException("No SharedTransitionScope found")
+        val animatedVisibilityScope = LocalAnimatedVisibilityScope.current
+            ?: throw IllegalStateException("No AnimatedVisibilityScope found")
+        with(sharedTransitionScope) {
+            // Clickable top part
+            Row(
+                horizontalArrangement = spacedBy(8.dp),
                 modifier = Modifier
                     .clickable { onToggleDetailed() }
-                    .then(artworkSize)
+                    .sharedBounds(
+                        rememberSharedContentState(
+                            SharedKey(artwork.id, SharedElementType.Bounds)
+                        ),
+                        animatedVisibilityScope,
+                    )
+                    .heightIn(min = 72.dp)
+                    .height(IntrinsicSize.Min)
             ) {
-                Text(
-                    text = AnnotatedString.fromHtml(artwork.title),
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier
-                        .sharedBounds(
-                            rememberSharedContentState(
-                                SharedKey(artwork.id, SharedElementType.Title)
-                            ),
-                            animatedVisibilityScope,
+                Column(
+                    Modifier
+                        .padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
+                        .weight(1f)
+                ) {
+                    Text(
+                        text = AnnotatedString.fromHtml(artwork.title),
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .sharedBounds(
+                                rememberSharedContentState(
+                                    SharedKey(artwork.id, SharedElementType.Title)
+                                ),
+                                animatedVisibilityScope,
+                            )
+                    )
+                    secondaryFields.take(2).forEach { field ->
+                        SharedText(field, animatedVisibilityScope)
+                    }
+                }
+                val previewSize = 104.dp
+                if (artwork.images.isEmpty()) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .clickable(
+                                role = Role.Button,
+                                onClickLabel = stringResource(R.string.show_details),
+                            ) { onShowArtwork() }
+                            .padding(vertical = 8.dp)
+                            .width(previewSize)
+                            .fillMaxHeight()
+                    ) {
+                        val painter = if (artwork.isPublicDomain) {
+                            painterResource(R.drawable.ic_no_image)
+                        } else {
+                            painterResource(R.drawable.ic_copyright)
+                        }
+                        Icon(
+                            painter = painter,
+                            contentDescription = stringResource(R.string.no_image),
+                            modifier = Modifier
+                                .size(24.dp)
                         )
-                )
-                secondaryFields.firstOrNull()?.let {
-                    SharedText(it, animatedVisibilityScope)
+                    }
+                } else {
+                    with(sharedTransitionScope) {
+                        AsyncImage(
+                            request = ComposableImageRequest(artwork.images.first().previewUrl) {
+                                placeholder(MaterialTheme.colorScheme.surfaceVariant)
+                            },
+                            contentDescription = stringResource(R.string.artwork_preview),
+                            modifier = Modifier
+                                .clickable(
+                                    role = Role.Button,
+                                    onClickLabel = stringResource(R.string.show_details),
+                                ) { onShowArtwork() }
+                                .padding(vertical = 8.dp)
+                                .sharedBounds(
+                                    rememberSharedContentState(
+                                        SharedKey(artwork.id, SharedElementType.Image)
+                                    ),
+                                    animatedVisibilityScope,
+                                    resizeMode = RemeasureToBounds,
+                                )
+                                .width(previewSize)
+                                .heightIn(min = previewSize)
+                                .fillMaxHeight()
+                        )
+                    }
                 }
             }
-            // Additional fields and image
+            // Additional info and action buttons
             AnimatedVisibility(detailed) {
                 Column(Modifier.padding(horizontal = 16.dp)) {
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                    ) {
-                        Column(Modifier.weight(1f)) {
-                            for (i in 1..secondaryFields.lastIndex) {
-                                SharedText(secondaryFields[i], animatedVisibilityScope)
-                            }
-                        }
-                        ArtworkPreview(artwork)
+                    if (!artwork.isPublicDomain) {
+                        Text(
+                            text = stringResource(R.string.not_in_public_domain),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
                     }
                     Row(
                         horizontalArrangement = Arrangement.SpaceAround,
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
-                            .fillMaxWidth()
                             .padding(vertical = 8.dp)
+                            .fillMaxWidth()
                     ) {
                         TextButton(
                             onClick = onOpenWebpage,
@@ -416,9 +432,9 @@ private fun SharedTransitionScope.SharedText(
 }
 
 private val notFoundSize = Modifier
+    .heightIn(min = 56.dp)
     .fillMaxWidth()
     .padding(horizontal = 16.dp, vertical = 8.dp)
-    .height(40.dp)
 
 @Composable
 private fun NotFoundPlaceholder(
@@ -428,7 +444,6 @@ private fun NotFoundPlaceholder(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier) {
-        HorizontalDivider()
         Box(
             contentAlignment = Alignment.CenterStart,
             modifier = Modifier
@@ -457,6 +472,37 @@ private fun NotFoundPlaceholder(
                 }
             }
         }
+    }
+}
+
+private fun LazyListScope.appendStateFooter(
+    appendState: LoadState,
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    when (appendState) {
+        is LoadState.Loading -> item {
+            HorizontalDivider()
+            CircularProgressIndicator(
+                modifier = modifier.wrapContentSize(Alignment.Center)
+            )
+        }
+
+        is LoadState.Error -> item {
+            HorizontalDivider()
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = modifier.clickable(
+                    role = Role.Button,
+                    onClick = onRetry,
+                )
+            ) {
+                Text(stringResource(R.string.error_loading_artworks))
+            }
+        }
+
+        else -> Unit
     }
 }
 
@@ -495,108 +541,25 @@ private fun ErrorIndicator(
     }
 }
 
-private val previewSize = Modifier
-    .padding(start = 8.dp)
-    .requiredSize(150.dp)
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun ArtworkPreview(
-    artwork: Artwork,
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier
-            .then(previewSize)
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .semantics(mergeDescendants = true) {}
-    ) {
-        if (artwork.images.isEmpty()) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(
-                    text = stringResource(R.string.no_image),
-                    textAlign = TextAlign.Center,
-                )
-                if (!artwork.isPublicDomain) {
-                    Text(
-                        text = stringResource(R.string.not_in_public_domain),
-                        textAlign = TextAlign.Center,
-                    )
-                    val tooltipState = rememberTooltipState()
-                    val scope = rememberCoroutineScope()
-                    TooltipBox(
-                        positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
-                        tooltip = {
-                            PlainTooltip { Text(stringResource(R.string.not_in_public_domain_tooltip)) }
-                        },
-                        state = tooltipState,
-                    ) {
-                        IconButton({ scope.launch { tooltipState.show() } }) {
-                            Icon(Icons.Default.Info, stringResource(R.string.show_additional_info))
-                        }
-                    }
-                }
-            }
-        } else {
-            val imageState = rememberAsyncImageState()
-            val sharedTransitionScope = LocalSharedTransitionScope.current
-                ?: throw IllegalStateException("No SharedTransitionScope found")
-            val animatedVisibilityScope = LocalAnimatedVisibilityScope.current
-                ?: throw IllegalStateException("No AnimatedVisibilityScope found")
-            with(sharedTransitionScope) {
-                AsyncImage(
-                    uri = artwork.images.first().previewUrl,
-                    state = imageState,
-                    contentDescription = stringResource(R.string.artwork_preview),
-                    modifier = Modifier
-                        .sharedBounds(
-                            rememberSharedContentState(
-                                SharedKey(artwork.id, SharedElementType.Image)
-                            ),
-                            animatedVisibilityScope,
-                            resizeMode = RemeasureToBounds,
-                        )
-                        .fillMaxSize()
-                )
-            }
-            when (imageState.loadState) {
-                is SketchLoadState.Started -> {
-                    CircularProgressIndicator(Modifier.zIndex(1f))
-                }
-
-                is SketchLoadState.Error -> {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clickable { imageState.restart() }
-                            .padding(8.dp)
-                            .zIndex(1f)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.reload_failed_image),
-                            textAlign = TextAlign.Center,
-                        )
-                    }
-                }
-
-                // Success, Canceled, null
-                else -> {}
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true)
+@Preview(
+    name = "Night mode",
+    showBackground = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
+)
+@Preview(
+    name = "Day mode",
+    showBackground = true,
+)
 @Composable
 private fun ArtworkWithoutPreviewPreview() {
     val artwork = createArtwork(title = "Short title")
     var detailedView by remember { mutableStateOf(false) }
-    SharedScopes {
-        Artwork(artwork, { detailedView = !detailedView }, detailedView, {}, {})
+    MetropolitanMuseumTheme {
+        Surface {
+            SharedScopes {
+                Artwork(artwork, { detailedView = !detailedView }, detailedView, {}, {})
+            }
+        }
     }
 }
 
@@ -688,7 +651,11 @@ private fun LoadingScreenPreview() {
 @Composable
 private fun SuccessScreenPreview() {
     val items: List<ArtworkInfo> = List(20) { i ->
-        createArtwork(id = i, title = "Artwork №$i", culture = "Culture", date = "Date")
+        if (i % 4 == 0) {
+            ArtworkInfo.NotFound(i)
+        } else {
+            createArtwork(id = i, title = "Artwork №$i", culture = "Culture", date = "Date")
+        }
     }
     val pagingItems = MutableStateFlow(PagingData.from(items)).collectAsLazyPagingItems()
     SharedScopes {
