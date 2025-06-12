@@ -12,7 +12,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
+import androidx.compose.foundation.layout.Arrangement.spacedBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -261,7 +261,8 @@ private fun Artwork(
                     .height(IntrinsicSize.Min)
             ) {
                 Column(
-                    Modifier
+                    verticalArrangement = spacedBy(8.dp),
+                    modifier = Modifier
                         .padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
                         .weight(1f)
                 ) {
@@ -300,13 +301,8 @@ private fun Artwork(
                             .width(previewSize)
                             .fillMaxHeight()
                     ) {
-                        val painter = if (artwork.isPublicDomain) {
-                            painterResource(R.drawable.ic_no_image)
-                        } else {
-                            painterResource(R.drawable.ic_copyright)
-                        }
                         Icon(
-                            painter = painter,
+                            painter = painterResource(R.drawable.ic_no_image),
                             contentDescription = stringResource(R.string.no_image),
                             modifier = Modifier
                                 .size(24.dp)
