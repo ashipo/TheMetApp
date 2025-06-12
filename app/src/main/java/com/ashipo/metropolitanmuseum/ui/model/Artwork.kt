@@ -8,13 +8,19 @@ import kotlinx.serialization.Serializable
 /**
  * Domain Artwork object. Nullable fields should be either null or non-blank.
  *
- * @param title may contain HTML tags
+ * @param constituents list of constituents. The first one should contain the same data as
+ * [artistRole] and [artistName] fields.
  */
 @Serializable
 data class Artwork(
     override val id: Int,
     val title: String,
     val constituents: List<Constituent> = emptyList(),
+    val artistName: String? = null,
+    val artistRole: String? = null,
+    val artistBio: String? = null,
+    val artistPrefix: String? = null,
+    val artistSuffix: String? = null,
     val period: String? = null,
     val date: String? = null,
     val geography: String? = null,
@@ -32,6 +38,11 @@ fun NetworkArtwork.toLocal() = Artwork(
     id = id,
     title = getTitle(),
     constituents = getConstituents(),
+    artistName = artistName.takeIf { it.isNotBlank() },
+    artistRole = artistRole.takeIf { it.isNotBlank() },
+    artistBio = artistBio.takeIf { it.isNotBlank() },
+    artistPrefix = artistPrefix.takeIf { it.isNotBlank() },
+    artistSuffix = artistSuffix.takeIf { it.isNotBlank() },
     period = period.takeIf { it.isNotBlank() },
     date = date.takeIf { it.isNotBlank() },
     geography = getGeography(),

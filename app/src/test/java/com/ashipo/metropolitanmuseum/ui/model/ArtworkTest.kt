@@ -8,6 +8,7 @@ import com.ashipo.metropolitanmuseum.data.network.model.NetworkTag
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertNull
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -97,6 +98,76 @@ class ArtworkTest {
             val actual = networkArtwork.toLocal().constituents
 
             assertTrue { actual.isEmpty() }
+        }
+
+        @Test
+        @DisplayName("Artwork fields - are backed up by NetworkArtwork fields")
+        fun `Artwork fields - are backed up by NetworkArtwork fields`() {
+            val networkArtwork = NetworkArtwork(
+                id = 12,
+                artistName = "artistName",
+                artistRole = "artistRole",
+                artistBio = "artistBio",
+                artistPrefix = "artistPrefix",
+                artistSuffix = "artistSuffix",
+                period = "period",
+                date = "date",
+                culture = "culture",
+                medium = "medium",
+                classification = "classification",
+                department = "department",
+                objectPageUrl = "objectPageUrl",
+            )
+
+            val actual = networkArtwork.toLocal()
+
+            assertEquals(networkArtwork.artistName, actual.artistName)
+            assertEquals(networkArtwork.artistRole, actual.artistRole)
+            assertEquals(networkArtwork.artistBio, actual.artistBio)
+            assertEquals(networkArtwork.artistPrefix, actual.artistPrefix)
+            assertEquals(networkArtwork.artistSuffix, actual.artistSuffix)
+            assertEquals(networkArtwork.period, actual.period)
+            assertEquals(networkArtwork.date, actual.date)
+            assertEquals(networkArtwork.culture, actual.culture)
+            assertEquals(networkArtwork.medium, actual.medium)
+            assertEquals(networkArtwork.classification, actual.classification)
+            assertEquals(networkArtwork.department, actual.department)
+            assertEquals(networkArtwork.objectPageUrl, actual.objectPageUrl)
+        }
+
+        @Test
+        @DisplayName("Artwork fields - when backing NetworkArtwork fields are blank - are null")
+        fun `Artwork fields - when backing NetworkArtwork fields are blank - are null`() {
+            val networkArtwork = NetworkArtwork(
+                id = 12,
+                artistName = " ",
+                artistRole = " ",
+                artistBio = " ",
+                artistPrefix = " ",
+                artistSuffix = " ",
+                period = " ",
+                date = " ",
+                culture = " ",
+                medium = " ",
+                classification = " ",
+                department = " ",
+                objectPageUrl = " ",
+            )
+
+            val actual = networkArtwork.toLocal()
+
+            assertNull(actual.artistName)
+            assertNull(actual.artistRole)
+            assertNull(actual.artistBio)
+            assertNull(actual.artistPrefix)
+            assertNull(actual.artistSuffix)
+            assertNull(actual.period)
+            assertNull(actual.date)
+            assertNull(actual.culture)
+            assertNull(actual.medium)
+            assertNull(actual.classification)
+            assertNull(actual.department)
+            assertNull(actual.objectPageUrl)
         }
 
         @Test
