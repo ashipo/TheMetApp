@@ -4,9 +4,7 @@ package com.ashipo.metropolitanmuseum.ui.searchresult
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.SharedTransitionScope.ResizeMode.Companion.RemeasureToBounds
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -70,7 +68,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -93,7 +90,6 @@ import com.ashipo.metropolitanmuseum.ui.theme.MetropolitanMuseumTheme
 import com.ashipo.metropolitanmuseum.ui.util.SharedElementType
 import com.ashipo.metropolitanmuseum.ui.util.SharedKey
 import com.ashipo.metropolitanmuseum.ui.util.SharedScopes
-import com.ashipo.metropolitanmuseum.ui.util.buildDescriptionString
 import com.ashipo.metropolitanmuseum.ui.util.openUrl
 import com.github.panpf.sketch.AsyncImage
 import com.github.panpf.sketch.request.ComposableImageRequest
@@ -231,8 +227,6 @@ fun SearchResultScreen(
     }
 }
 
-private data class SharedField(val text: AnnotatedString, val key: SharedKey)
-
 @Composable
 private fun Artwork(
     artwork: Artwork,
@@ -242,46 +236,7 @@ private fun Artwork(
     onOpenWebpage: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val maker = stringResource(R.string.maker)
-    val various = stringResource(R.string.various)
-    val periodLabel = stringResource(R.string.period)
-    val dateLabel = stringResource(R.string.date)
-    val cultureLabel = stringResource(R.string.culture)
-    val mediumLabel = stringResource(R.string.medium)
-    val secondaryFields = remember(artwork) {
-        buildList {
-            if (artwork.constituents.isNotEmpty()) {
-                val text = if (artwork.constituents.size == 1) {
-                    val maker = artwork.constituents.first()
-                    buildDescriptionString(maker.role, maker.name, true)
-                } else {
-                    buildDescriptionString(maker, various)
-                }
-                val key = SharedKey(artwork.id, SharedElementType.Creator)
-                add(SharedField(text, key))
-            }
-            artwork.period?.let {
-                val text = buildDescriptionString(periodLabel, it)
-                val key = SharedKey(artwork.id, SharedElementType.Period)
-                add(SharedField(text, key))
-            }
-            artwork.date?.let {
-                val text = buildDescriptionString(dateLabel, it)
-                val key = SharedKey(artwork.id, SharedElementType.Date)
-                add(SharedField(text, key))
-            }
-            artwork.culture?.let {
-                val text = buildDescriptionString(cultureLabel, it)
-                val key = SharedKey(artwork.id, SharedElementType.Culture)
-                add(SharedField(text, key))
-            }
-            artwork.medium?.let {
-                val text = buildDescriptionString(mediumLabel, it)
-                val key = SharedKey(artwork.id, SharedElementType.Medium)
-                add(SharedField(text, key))
-            }
-        }
-    }
+    val secondaryFields = remember(artwork) { getSecondaryFields(artwork) }
     Column(
         modifier = modifier
             .testTag("artwork:${artwork.id}")
@@ -312,7 +267,7 @@ private fun Artwork(
                 ) {
                     Text(
                         text = AnnotatedString.fromHtml(artwork.title),
-                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.bodyLarge,
                         maxLines = 3,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier
@@ -323,8 +278,13 @@ private fun Artwork(
                                 animatedVisibilityScope,
                             )
                     )
-                    secondaryFields.take(2).forEach { field ->
-                        SharedText(field, animatedVisibilityScope)
+                    secondaryFields.forEach { field ->
+                        Text(
+                            text = field,
+                            maxLines = 2,
+                            style = MaterialTheme.typography.bodyMedium,
+                            overflow = TextOverflow.Ellipsis,
+                        )
                     }
                 }
                 val previewSize = 104.dp
@@ -414,21 +374,19 @@ private fun Artwork(
     }
 }
 
-@Composable
-private fun SharedTransitionScope.SharedText(
-    field: SharedField,
-    animatedVisibilityScope: AnimatedVisibilityScope,
-    modifier: Modifier = Modifier,
-) {
-    Text(
-        text = field.text,
-        maxLines = 2,
-        overflow = TextOverflow.Ellipsis,
-        modifier = modifier.sharedBounds(
-            sharedContentState = rememberSharedContentState(field.key),
-            animatedVisibilityScope = animatedVisibilityScope,
-        )
-    )
+/**
+ * Returns a list of the following fields, if present:
+ * - name of the main artist OR culture
+ * - date
+ */
+private fun getSecondaryFields(artwork: Artwork): List<String> = buildList {
+    if (artwork.artistName.isNullOrBlank()) {
+        artwork.culture?.let { add(it) }
+    } else {
+        add(artwork.artistName)
+    }
+
+    artwork.date?.let { add(it) }
 }
 
 private val notFoundSize = Modifier
