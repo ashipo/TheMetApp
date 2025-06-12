@@ -150,12 +150,12 @@ class SearchResultScreenTest {
     }
 
     @Test
-    fun artworkConstituents_htmlIsConverted() {
+    fun artworkArtist_htmlIsConverted() {
         val artworks = listOf(
             Artwork(
                 id = 1,
                 title = "Title",
-                constituents = listOf(Constituent("Artist", "<b>Mr.</b>.&#x20AC;")),
+                artistName = "<b>Mr.</b>.&#x20AC;",
             )
         )
         val items = Pager(
@@ -175,14 +175,43 @@ class SearchResultScreenTest {
         }
 
         composeTestRule.apply {
-            onNodeWithTag("artwork:1").performClick()
-        }
-
-        composeTestRule.apply {
             onNodeWithText("Mr.", true).assertExists()
             onNodeWithText("€", true).assertExists()
             onNodeWithText("&#x20AC;", true).assertDoesNotExist()
             onNodeWithText("<b>", true).assertDoesNotExist()
+        }
+    }
+
+    @Test
+    fun artworkDate_htmlIsConverted() {
+        val artworks = listOf(
+            Artwork(
+                id = 1,
+                title = "Title",
+                date = "Apostrophe&#39;s <i>Italic</i>",
+            )
+        )
+        val items = Pager(
+            config = PagingConfig(pageSize = PAGE_SIZE),
+            pagingSourceFactory = (artworks as List<ArtworkInfo>).asPagingSourceFactory(),
+        ).flow
+
+        composeTestRule.setContent {
+            SharedScopes {
+                val items = items.collectAsLazyPagingItems()
+                SearchResultScreen(
+                    uiState = SearchResultUiState.Success(artworks.size),
+                    pagingArtworks = items,
+                    onAction = {},
+                )
+            }
+        }
+
+        composeTestRule.apply {
+            onNodeWithText("Italic", true).assertExists()
+            onNodeWithText("'", true).assertExists()
+            onNodeWithText("&#39;", true).assertDoesNotExist()
+            onNodeWithText("<i>", true).assertDoesNotExist()
         }
     }
 }

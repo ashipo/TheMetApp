@@ -167,33 +167,33 @@ fun ArtworkDetailScreen(
                     for (constituent in uiState.constituents) {
                         Text(buildDescriptionString(constituent.role, constituent.name, true))
                     }
-                    uiState.period?.let { period ->
-                        Text(buildDescriptionString(stringResource(R.string.period), period))
+                    uiState.period?.let {
+                        val label = stringResource(R.string.period)
+                        Text(buildDescriptionString(label, it, true))
                     }
-                    uiState.date?.let { date ->
-                        Text(buildDescriptionString(stringResource(R.string.date), date))
+                    uiState.date?.let {
+                        val label = stringResource(R.string.date)
+                        Text(buildDescriptionString(label, it, true))
                     }
-                    uiState.culture?.let { culture ->
-                        Text(buildDescriptionString(stringResource(R.string.culture), culture))
+                    uiState.culture?.let {
+                        val label = stringResource(R.string.culture)
+                        Text(buildDescriptionString(label, it, true))
                     }
-                    uiState.medium?.let { medium ->
-                        Text(buildDescriptionString(stringResource(R.string.medium), medium))
+                    uiState.medium?.let {
+                        val label = stringResource(R.string.medium)
+                        Text(buildDescriptionString(label, it, true))
                     }
-                    uiState.geography?.let { geography ->
-                        Text(buildDescriptionString(stringResource(R.string.geography), geography))
+                    uiState.geography?.let {
+                        val label = stringResource(R.string.geography)
+                        Text(buildDescriptionString(label, it, true))
                     }
-                    uiState.classification?.let { classification ->
-                        Text(
-                            buildDescriptionString(
-                                stringResource(R.string.classification),
-                                classification,
-                            ),
-                        )
+                    uiState.classification?.let {
+                        val label = stringResource(R.string.classification)
+                        Text(buildDescriptionString(label, it, true))
                     }
-                    uiState.department?.let { department ->
-                        Text(
-                            buildDescriptionString(stringResource(R.string.department), department),
-                        )
+                    uiState.department?.let {
+                        val label = stringResource(R.string.department)
+                        Text(buildDescriptionString(label, it, true))
                     }
                 }
             }

@@ -181,4 +181,141 @@ class ArtworkDetailScreenTest {
             onNodeWithText("<b>", true).assertDoesNotExist()
         }
     }
+
+    @Test
+    fun period_htmlIsConverted() {
+        composeTestRule.setContent {
+            SharedScopes {
+                ArtworkDetailScreen(
+                    ArtworkDetailScreenState(1, "T", period = "Apostrophe&#39;s <i>Italic</i>"),
+                    {},
+                )
+            }
+        }
+
+        composeTestRule.apply {
+            onNodeWithText("Italic", true).assertExists()
+            onNodeWithText("'", true).assertExists()
+            onNodeWithText("&#39;", true).assertDoesNotExist()
+            onNodeWithText("<i>", true).assertDoesNotExist()
+        }
+    }
+
+    @Test
+    fun date_htmlIsConverted() {
+        composeTestRule.setContent {
+            SharedScopes {
+                ArtworkDetailScreen(
+                    ArtworkDetailScreenState(1, "T", date = "Apostrophe&#39;s <i>Italic</i>"),
+                    {},
+                )
+            }
+        }
+
+        composeTestRule.apply {
+            onNodeWithText("Italic", true).assertExists()
+            onNodeWithText("'", true).assertExists()
+            onNodeWithText("&#39;", true).assertDoesNotExist()
+            onNodeWithText("<i>", true).assertDoesNotExist()
+        }
+    }
+
+    @Test
+    fun culture_htmlIsConverted() {
+        composeTestRule.setContent {
+            SharedScopes {
+                ArtworkDetailScreen(
+                    ArtworkDetailScreenState(1, "T", culture = "Apostrophe&#39;s <i>Italic</i>"),
+                    {},
+                )
+            }
+        }
+
+        composeTestRule.apply {
+            onNodeWithText("Italic", true).assertExists()
+            onNodeWithText("'", true).assertExists()
+            onNodeWithText("&#39;", true).assertDoesNotExist()
+            onNodeWithText("<i>", true).assertDoesNotExist()
+        }
+    }
+
+    @Test
+    fun medium_htmlIsConverted() {
+        composeTestRule.setContent {
+            SharedScopes {
+                ArtworkDetailScreen(
+                    ArtworkDetailScreenState(1, "T", medium = "Apostrophe&#39;s <i>Italic</i>"),
+                    {},
+                )
+            }
+        }
+
+        composeTestRule.apply {
+            onNodeWithText("Italic", true).assertExists()
+            onNodeWithText("'", true).assertExists()
+            onNodeWithText("&#39;", true).assertDoesNotExist()
+            onNodeWithText("<i>", true).assertDoesNotExist()
+        }
+    }
+
+    @Test
+    fun geography_htmlIsConverted() {
+        composeTestRule.setContent {
+            SharedScopes {
+                ArtworkDetailScreen(
+                    ArtworkDetailScreenState(1, "T", geography = "Apostrophe&#39;s <i>Italic</i>"),
+                    {},
+                )
+            }
+        }
+
+        composeTestRule.apply {
+            onNodeWithText("Italic", true).assertExists()
+            onNodeWithText("'", true).assertExists()
+            onNodeWithText("&#39;", true).assertDoesNotExist()
+            onNodeWithText("<i>", true).assertDoesNotExist()
+        }
+    }
+
+    @Test
+    fun classification_htmlIsConverted() {
+        composeTestRule.setContent {
+            SharedScopes {
+                ArtworkDetailScreen(
+                    ArtworkDetailScreenState(
+                        id = 1,
+                        title = "T",
+                        classification = "Apostrophe&#39;s <i>Italic</i>",
+                    ),
+                    {},
+                )
+            }
+        }
+
+        composeTestRule.apply {
+            onNodeWithText("Italic", true).assertExists()
+            onNodeWithText("'", true).assertExists()
+            onNodeWithText("&#39;", true).assertDoesNotExist()
+            onNodeWithText("<i>", true).assertDoesNotExist()
+        }
+    }
+
+    @Test
+    fun department_htmlIsConverted() {
+        composeTestRule.setContent {
+            SharedScopes {
+                ArtworkDetailScreen(
+                    ArtworkDetailScreenState(1, "T", department = "Apostrophe&#39;s <i>Italic</i>"),
+                    {},
+                )
+            }
+        }
+
+        composeTestRule.apply {
+            onNodeWithText("Italic", true).assertExists()
+            onNodeWithText("'", true).assertExists()
+            onNodeWithText("&#39;", true).assertDoesNotExist()
+            onNodeWithText("<i>", true).assertDoesNotExist()
+        }
+    }
 }
