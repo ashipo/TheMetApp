@@ -153,7 +153,6 @@ fun ArtworkDetailScreen(
                     modifier = Modifier
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                 ) {
-                    // Title
                     Text(
                         text = AnnotatedString.fromHtml(uiState.title),
                         style = MaterialTheme.typography.headlineSmall,
@@ -165,84 +164,24 @@ fun ArtworkDetailScreen(
                                 animatedVisibilityScope,
                             )
                     )
-                    // Constituents
-                    if (uiState.constituents.size == 1) {
-                        val constituent = uiState.constituents.first()
-                        Text(
-                            buildDescriptionString(constituent.role, constituent.name, true),
-                            modifier = Modifier
-                                .sharedBounds(
-                                    rememberSharedContentState(
-                                        SharedKey(uiState.id, SharedElementType.Creator)
-                                    ),
-                                    animatedVisibilityScope,
-                                )
-                        )
-                    } else {
-                        for (constituent in uiState.constituents) {
-                            Text(buildDescriptionString(constituent.role, constituent.name, true))
-                        }
+                    for (constituent in uiState.constituents) {
+                        Text(buildDescriptionString(constituent.role, constituent.name, true))
                     }
-                    // Period
                     uiState.period?.let { period ->
-                        Text(
-                            buildDescriptionString(stringResource(R.string.period), period),
-                            modifier = Modifier
-                                .sharedBounds(
-                                    rememberSharedContentState(
-                                        SharedKey(uiState.id, SharedElementType.Period)
-                                    ),
-                                    animatedVisibilityScope,
-                                )
-                        )
+                        Text(buildDescriptionString(stringResource(R.string.period), period))
                     }
-                    // Date
                     uiState.date?.let { date ->
-                        Text(
-                            buildDescriptionString(stringResource(R.string.date), date),
-                            modifier = Modifier
-                                .sharedBounds(
-                                    rememberSharedContentState(
-                                        SharedKey(uiState.id, SharedElementType.Date)
-                                    ),
-                                    animatedVisibilityScope,
-                                )
-                        )
+                        Text(buildDescriptionString(stringResource(R.string.date), date))
                     }
-                    // Culture
                     uiState.culture?.let { culture ->
-                        Text(
-                            buildDescriptionString(
-                                stringResource(R.string.culture),
-                                culture,
-                            ),
-                            modifier = Modifier
-                                .sharedBounds(
-                                    rememberSharedContentState(
-                                        SharedKey(uiState.id, SharedElementType.Culture)
-                                    ),
-                                    animatedVisibilityScope,
-                                )
-                        )
+                        Text(buildDescriptionString(stringResource(R.string.culture), culture))
                     }
-                    // Medium
                     uiState.medium?.let { medium ->
-                        Text(
-                            buildDescriptionString(stringResource(R.string.medium), medium),
-                            modifier = Modifier
-                                .sharedBounds(
-                                    rememberSharedContentState(
-                                        SharedKey(uiState.id, SharedElementType.Medium)
-                                    ),
-                                    animatedVisibilityScope,
-                                )
-                        )
+                        Text(buildDescriptionString(stringResource(R.string.medium), medium))
                     }
-                    // Geography
                     uiState.geography?.let { geography ->
                         Text(buildDescriptionString(stringResource(R.string.geography), geography))
                     }
-                    // Classification
                     uiState.classification?.let { classification ->
                         Text(
                             buildDescriptionString(
@@ -251,7 +190,6 @@ fun ArtworkDetailScreen(
                             ),
                         )
                     }
-                    // Department
                     uiState.department?.let { department ->
                         Text(
                             buildDescriptionString(stringResource(R.string.department), department),

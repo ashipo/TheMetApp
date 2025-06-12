@@ -6,9 +6,4 @@ enum class SharedElementType {
     Bounds,
     Image,
     Title,
-    Creator,
-    Period,
-    Date,
-    Culture,
-    Medium,
 }
