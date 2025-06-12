@@ -375,14 +375,14 @@ private fun Artwork(
  * - name of the main artist OR culture
  * - date
  */
-private fun getSecondaryFields(artwork: Artwork): List<String> = buildList {
+private fun getSecondaryFields(artwork: Artwork): List<AnnotatedString> = buildList {
     if (artwork.artistName.isNullOrBlank()) {
-        artwork.culture?.let { add(it) }
+        artwork.culture?.let { add(AnnotatedString.fromHtml(it)) }
     } else {
-        add(artwork.artistName)
+        add(AnnotatedString.fromHtml(artwork.artistName))
     }
 
-    artwork.date?.let { add(it) }
+    artwork.date?.let { add(AnnotatedString.fromHtml(it)) }
 }
 
 private val notFoundSize = Modifier
