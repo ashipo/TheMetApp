@@ -28,7 +28,7 @@ fun openUrl(url: String, context: Context) {
 fun buildDescriptionString(
     label: String,
     value: String,
-    convertHtml: Boolean = false,
+    convertHtml: Boolean = true,
 ): AnnotatedString {
     return buildAnnotatedString {
         withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {

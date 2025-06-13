@@ -202,6 +202,44 @@ class ArtworkDetailScreenTest {
     }
 
     @Test
+    fun dynasty_htmlIsConverted() {
+        composeTestRule.setContent {
+            SharedScopes {
+                ArtworkDetailScreen(
+                    ArtworkDetailScreenState(1, "T", dynasty = "Apostrophe&#39;s <i>Italic</i>"),
+                    {},
+                )
+            }
+        }
+
+        composeTestRule.apply {
+            onNodeWithText("Italic", true).assertExists()
+            onNodeWithText("'", true).assertExists()
+            onNodeWithText("&#39;", true).assertDoesNotExist()
+            onNodeWithText("<i>", true).assertDoesNotExist()
+        }
+    }
+
+    @Test
+    fun reign_htmlIsConverted() {
+        composeTestRule.setContent {
+            SharedScopes {
+                ArtworkDetailScreen(
+                    ArtworkDetailScreenState(1, "T", reign = "Apostrophe&#39;s <i>Italic</i>"),
+                    {},
+                )
+            }
+        }
+
+        composeTestRule.apply {
+            onNodeWithText("Italic", true).assertExists()
+            onNodeWithText("'", true).assertExists()
+            onNodeWithText("&#39;", true).assertDoesNotExist()
+            onNodeWithText("<i>", true).assertDoesNotExist()
+        }
+    }
+
+    @Test
     fun date_htmlIsConverted() {
         composeTestRule.setContent {
             SharedScopes {
@@ -278,6 +316,25 @@ class ArtworkDetailScreenTest {
     }
 
     @Test
+    fun dimensions_htmlIsConverted() {
+        composeTestRule.setContent {
+            SharedScopes {
+                ArtworkDetailScreen(
+                    ArtworkDetailScreenState(1, "T", dimensions = "Apostrophe&#39;s <i>Italic</i>"),
+                    {},
+                )
+            }
+        }
+
+        composeTestRule.apply {
+            onNodeWithText("Italic", true).assertExists()
+            onNodeWithText("'", true).assertExists()
+            onNodeWithText("&#39;", true).assertDoesNotExist()
+            onNodeWithText("<i>", true).assertDoesNotExist()
+        }
+    }
+
+    @Test
     fun classification_htmlIsConverted() {
         composeTestRule.setContent {
             SharedScopes {
@@ -286,6 +343,29 @@ class ArtworkDetailScreenTest {
                         id = 1,
                         title = "T",
                         classification = "Apostrophe&#39;s <i>Italic</i>",
+                    ),
+                    {},
+                )
+            }
+        }
+
+        composeTestRule.apply {
+            onNodeWithText("Italic", true).assertExists()
+            onNodeWithText("'", true).assertExists()
+            onNodeWithText("&#39;", true).assertDoesNotExist()
+            onNodeWithText("<i>", true).assertDoesNotExist()
+        }
+    }
+
+    @Test
+    fun creditLine_htmlIsConverted() {
+        composeTestRule.setContent {
+            SharedScopes {
+                ArtworkDetailScreen(
+                    ArtworkDetailScreenState(
+                        id = 1,
+                        title = "T",
+                        creditLine = "Apostrophe&#39;s <i>Italic</i>",
                     ),
                     {},
                 )

@@ -165,35 +165,51 @@ fun ArtworkDetailScreen(
                             )
                     )
                     for (constituent in uiState.constituents) {
-                        Text(buildDescriptionString(constituent.role, constituent.name, true))
+                        Text(buildDescriptionString(constituent.role, constituent.name))
                     }
                     uiState.period?.let {
                         val label = stringResource(R.string.period)
-                        Text(buildDescriptionString(label, it, true))
+                        Text(buildDescriptionString(label, it))
+                    }
+                    uiState.dynasty?.let {
+                        val label = stringResource(R.string.dynasty)
+                        Text(buildDescriptionString(label, it))
+                    }
+                    uiState.reign?.let {
+                        val label = stringResource(R.string.reign)
+                        Text(buildDescriptionString(label, it))
                     }
                     uiState.date?.let {
                         val label = stringResource(R.string.date)
-                        Text(buildDescriptionString(label, it, true))
-                    }
-                    uiState.culture?.let {
-                        val label = stringResource(R.string.culture)
-                        Text(buildDescriptionString(label, it, true))
-                    }
-                    uiState.medium?.let {
-                        val label = stringResource(R.string.medium)
-                        Text(buildDescriptionString(label, it, true))
+                        Text(buildDescriptionString(label, it))
                     }
                     uiState.geography?.let {
                         val label = stringResource(R.string.geography)
-                        Text(buildDescriptionString(label, it, true))
+                        Text(buildDescriptionString(label, it))
+                    }
+                    uiState.culture?.let {
+                        val label = stringResource(R.string.culture)
+                        Text(buildDescriptionString(label, it))
+                    }
+                    uiState.medium?.let {
+                        val label = stringResource(R.string.medium)
+                        Text(buildDescriptionString(label, it))
+                    }
+                    uiState.dimensions?.let {
+                        val label = stringResource(R.string.dimensions)
+                        Text(buildDescriptionString(label, it))
                     }
                     uiState.classification?.let {
                         val label = stringResource(R.string.classification)
-                        Text(buildDescriptionString(label, it, true))
+                        Text(buildDescriptionString(label, it))
+                    }
+                    uiState.creditLine?.let {
+                        val label = stringResource(R.string.credit_line)
+                        Text(buildDescriptionString(label, it))
                     }
                     uiState.department?.let {
                         val label = stringResource(R.string.department)
-                        Text(buildDescriptionString(label, it, true))
+                        Text(buildDescriptionString(label, it))
                     }
                 }
             }

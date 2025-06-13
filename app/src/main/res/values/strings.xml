@@ -58,11 +58,15 @@
     <string name="title">Title</string>
     <string name="maker">Maker</string>
     <string name="period">Period</string>
+    <string name="dynasty">Dynasty</string>
+    <string name="reign">Reign</string>
     <string name="date">Date</string>
     <string name="geography">Geography</string>
     <string name="culture">Culture</string>
     <string name="medium">Medium</string>
+    <string name="dimensions">Dimensions</string>
     <string name="classification">Classification</string>
+    <string name="credit_line">Credit Line</string>
 
     <string name="artwork_url_template" translatable="false">https://www.metmuseum.org/art/collection/search/%1$s</string>
 </resources>
