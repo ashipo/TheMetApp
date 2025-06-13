@@ -12,10 +12,14 @@ import kotlinx.serialization.Serializable
  * @param title Title, identifying phrase, or name given to a work of art
  * @param culture Information about the culture, or people from which an object was created
  * @param period Time or time period when an object was created
+ * @param dynasty Dynasty under which an object was created
+ * @param reign Reign of a monarch or ruler under which an object was created
  * @param artistName Artist name in the correct order for display
  * @param date Describes the specific or approximate date when an artwork was designed or created
  * @param medium Materials that were used to create the artwork ("Oil on canvas", "Watercolor",
  * "Gold")
+ * @param dimensions Size of the artwork or object
+ * @param creditLine Text acknowledging the source or origin of the artwork.
  * @param classification Artwork type ("Basketry", "Ceramics", "Paintings")
  * @param tags An array of subject keyword tags associated with the object and their respective
  * AAT URL
@@ -38,6 +42,8 @@ data class NetworkArtwork(
     val title: String = "",
     val culture: String = "",
     val period: String = "",
+    val dynasty: String = "",
+    val reign: String = "",
     val constituents: List<NetworkConstituent>? = null,
     val artistRole: String = "",
     val artistPrefix: String = "",
@@ -49,6 +55,8 @@ data class NetworkArtwork(
     @SerializedName("objectDate")
     val date: String = "",
     val medium: String = "",
+    val dimensions: String = "",
+    val creditLine: String = "",
     val classification: String = "",
     val tags: List<NetworkTag>? = null,
 

@@ -111,9 +111,13 @@ class ArtworkTest {
                 artistPrefix = "artistPrefix",
                 artistSuffix = "artistSuffix",
                 period = "period",
+                dynasty = "dynasty",
+                reign = "reign",
                 date = "date",
                 culture = "culture",
                 medium = "medium",
+                dimensions = "dimensions",
+                creditLine = "creditLine",
                 classification = "classification",
                 department = "department",
                 objectPageUrl = "objectPageUrl",
@@ -127,9 +131,13 @@ class ArtworkTest {
             assertEquals(networkArtwork.artistPrefix, actual.artistPrefix)
             assertEquals(networkArtwork.artistSuffix, actual.artistSuffix)
             assertEquals(networkArtwork.period, actual.period)
+            assertEquals(networkArtwork.dynasty, actual.dynasty)
+            assertEquals(networkArtwork.reign, actual.reign)
             assertEquals(networkArtwork.date, actual.date)
             assertEquals(networkArtwork.culture, actual.culture)
             assertEquals(networkArtwork.medium, actual.medium)
+            assertEquals(networkArtwork.dimensions, actual.dimensions)
+            assertEquals(networkArtwork.creditLine, actual.creditLine)
             assertEquals(networkArtwork.classification, actual.classification)
             assertEquals(networkArtwork.department, actual.department)
             assertEquals(networkArtwork.objectPageUrl, actual.objectPageUrl)
@@ -146,9 +154,13 @@ class ArtworkTest {
                 artistPrefix = " ",
                 artistSuffix = " ",
                 period = " ",
+                dynasty = " ",
+                reign = " ",
                 date = " ",
                 culture = " ",
                 medium = " ",
+                dimensions = " ",
+                creditLine = " ",
                 classification = " ",
                 department = " ",
                 objectPageUrl = " ",
@@ -162,9 +174,13 @@ class ArtworkTest {
             assertNull(actual.artistPrefix)
             assertNull(actual.artistSuffix)
             assertNull(actual.period)
+            assertNull(actual.dynasty)
+            assertNull(actual.reign)
             assertNull(actual.date)
             assertNull(actual.culture)
             assertNull(actual.medium)
+            assertNull(actual.dimensions)
+            assertNull(actual.creditLine)
             assertNull(actual.classification)
             assertNull(actual.department)
             assertNull(actual.objectPageUrl)
