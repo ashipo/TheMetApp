@@ -10,6 +10,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Arrangement.spacedBy
@@ -259,6 +260,7 @@ private fun Artwork(
                     )
                     .heightIn(min = 72.dp)
                     .height(IntrinsicSize.Min)
+                    .background(MaterialTheme.colorScheme.background)
             ) {
                 Column(
                     verticalArrangement = spacedBy(8.dp),
