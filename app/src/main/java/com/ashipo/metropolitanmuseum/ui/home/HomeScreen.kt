@@ -86,6 +86,7 @@ fun HomeScreen(
                 Icon(Icons.Default.Search, stringResource(R.string.search))
             }
         },
+        contentWindowInsets = WindowInsets.safeDrawing,
         modifier = modifier
             .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
             .nestedScroll(scrollBehavior.nestedScrollConnection)
