@@ -138,6 +138,7 @@ fun ArtworkDetailScreen(
                         animatedVisibilityScope,
                     )
                     .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
             ) {
                 // Images
                 if (uiState.images.isNotEmpty()) {
