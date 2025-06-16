@@ -13,16 +13,19 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
-import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.systemBarsIgnoringVisibility
+import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
@@ -72,7 +75,7 @@ import com.github.panpf.sketch.request.ComposableImageRequest
 import com.github.panpf.sketch.request.LoadState
 import com.github.panpf.sketch.state.ThumbnailMemoryCacheStateImage
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun ArtworkDetailScreen(
     uiState: ArtworkDetailScreenState,
@@ -103,6 +106,10 @@ fun ArtworkDetailScreen(
                                 )
                             }
                         },
+                        // Avoid top bar movements when returning from ImageViewer with hidden system bars
+                        windowInsets = WindowInsets.systemBarsIgnoringVisibility.only(
+                            WindowInsetsSides.Horizontal + WindowInsetsSides.Top
+                        ),
                         scrollBehavior = scrollBehavior,
                         modifier = Modifier
                             .renderInSharedTransitionScopeOverlay(
@@ -118,7 +125,11 @@ fun ArtworkDetailScreen(
             }
         },
         modifier = modifier
-            .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
+            .windowInsetsPadding(
+                WindowInsets.systemBarsIgnoringVisibility
+                    .union(WindowInsets.displayCutout)
+                    .only(WindowInsetsSides.Horizontal)
+            )
             .nestedScroll(scrollBehavior.nestedScrollConnection),
     ) { innerPadding ->
         val sharedTransitionScope = LocalSharedTransitionScope.current

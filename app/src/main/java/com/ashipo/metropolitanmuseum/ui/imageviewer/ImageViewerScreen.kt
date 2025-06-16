@@ -2,6 +2,7 @@
 
 package com.ashipo.metropolitanmuseum.ui.imageviewer
 
+import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope.ResizeMode
 import androidx.compose.foundation.clickable
@@ -18,9 +19,11 @@ import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -30,6 +33,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.compose.dropUnlessResumed
 import com.ashipo.metropolitanmuseum.R
 import com.ashipo.metropolitanmuseum.ui.LocalAnimatedVisibilityScope
@@ -54,26 +60,51 @@ fun ImageViewerScreen(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val activity = LocalActivity.current
+    val windowInsetsController = remember {
+        val window = activity!!.window
+        WindowCompat.getInsetsController(window, window.decorView).apply {
+            systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+    }
+    var showUI by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(showUI) {
+        if (showUI) {
+            windowInsetsController.show(WindowInsetsCompat.Type.systemBars())
+        } else {
+            windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
+        }
+    }
+    // Show system UI on close
+    DisposableEffect(windowInsetsController) {
+        onDispose {
+            windowInsetsController.show(WindowInsetsCompat.Type.systemBars())
+        }
+    }
+
     Box(modifier) {
         val sharedTransitionScope = LocalSharedTransitionScope.current
             ?: throw IllegalStateException("No Scope found")
         val animatedVisibilityScope = LocalAnimatedVisibilityScope.current
             ?: throw IllegalStateException("No Scope found")
-        with(sharedTransitionScope) {
-            with(animatedVisibilityScope) {
-                FilledTonalIconButton(
-                    onClick = dropUnlessResumed { onNavigateBack() },
-                    modifier = Modifier
-                        .zIndex(1f)
-                        .align(Alignment.TopEnd)
-                        .safeDrawingPadding()
-                        .padding(8.dp)
-                        .renderInSharedTransitionScopeOverlay(
-                            zIndexInOverlay = 1f
-                        )
-                        .animateEnterExit()
-                ) {
-                    Icon(Icons.Default.Close, stringResource(R.string.close))
+        // Close button
+        if (showUI) {
+            with(sharedTransitionScope) {
+                with(animatedVisibilityScope) {
+                    FilledTonalIconButton(
+                        onClick = dropUnlessResumed { onNavigateBack() },
+                        modifier = Modifier
+                            .zIndex(1f)
+                            .align(Alignment.TopEnd)
+                            .safeDrawingPadding()
+                            .padding(8.dp)
+                            .renderInSharedTransitionScopeOverlay(
+                                zIndexInOverlay = 1f
+                            )
+                            .animateEnterExit()
+                    ) {
+                        Icon(Icons.Default.Close, stringResource(R.string.close))
+                    }
                 }
             }
         }
@@ -98,17 +129,6 @@ fun ImageViewerScreen(
                     crossfade(fadeStart = false, durationMillis = 500)
                 }
 
-                var isPlaceholderCached by rememberSaveable { mutableStateOf(false) }
-                val context = LocalContext.current
-                LaunchedEffect(Unit) {
-                    val sketch = context.sketch
-                    val memoryCache = sketch.memoryCache
-                    memoryCache.withLock(images[index].largeUrl) {
-                        // TODO: Refactor this hack (ask Sketch dev for a better way?)
-                        isPlaceholderCached = keys().any { it.startsWith(images[index].largeUrl) }
-                    }
-                }
-
                 with(sharedTransitionScope) {
                     SketchZoomAsyncImage(
                         request = request,
@@ -116,6 +136,7 @@ fun ImageViewerScreen(
                         zoomState = zoomState,
                         contentDescription = stringResource(R.string.artwork_image_template)
                             .format(index + 1),
+                        onTap = { showUI = !showUI },
                         modifier = Modifier
                             .zIndex(1f)
                             .sharedBounds(
@@ -128,7 +149,20 @@ fun ImageViewerScreen(
                             .fillMaxSize()
                     )
                 }
-
+                var isPlaceholderCached by rememberSaveable { mutableStateOf(false) }
+                val context = LocalContext.current
+                LaunchedEffect(Unit) {
+                    context.sketch.memoryCache.withLock(images[index].largeUrl) {
+                        // TODO: Refactor this hack (ask Sketch dev for a better way?)
+                        isPlaceholderCached = keys().any { it.startsWith(images[index].largeUrl) }
+                    }
+                }
+                // Show UI when "Error, tap to reload"
+                LaunchedEffect(imageState.loadState, isPlaceholderCached) {
+                    if (!isPlaceholderCached && imageState.loadState is LoadState.Error) {
+                        showUI = true
+                    }
+                }
                 when (imageState.loadState) {
                     is LoadState.Started -> {
                         CircularProgressIndicator()
