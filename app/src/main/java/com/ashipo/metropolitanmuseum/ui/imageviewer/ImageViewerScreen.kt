@@ -224,7 +224,7 @@ private fun CloseButton(
     total: Int,
     modifier: Modifier = Modifier,
 ) {
-    val containerColor = ButtonDefaults.filledTonalButtonColors().containerColor.copy(alpha = 0.5f)
+    val containerColor = ButtonDefaults.filledTonalButtonColors().containerColor.copy(alpha = 0.75f)
     FilledTonalButton(
         onClick = onClick,
         contentPadding = PaddingValues(start = 24.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
