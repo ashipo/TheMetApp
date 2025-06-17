@@ -7,12 +7,17 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope.ResizeMode
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.systemBarsIgnoringVisibility
+import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
@@ -59,6 +64,7 @@ import com.github.panpf.zoomimage.SketchZoomAsyncImage
 import com.github.panpf.zoomimage.rememberSketchZoomState
 import com.github.panpf.zoomimage.zoom.FixedScalesCalculator
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ImageViewerScreen(
     images: List<ArtworkImage>,
@@ -106,7 +112,10 @@ fun ImageViewerScreen(
                         modifier = Modifier
                             .zIndex(1f)
                             .align(Alignment.TopEnd)
-                            .safeDrawingPadding()
+                            .windowInsetsPadding(
+                                WindowInsets.systemBarsIgnoringVisibility
+                                    .union(WindowInsets.displayCutout)
+                            )
                             .padding(8.dp)
                             .renderInSharedTransitionScopeOverlay(
                                 zIndexInOverlay = 1f
