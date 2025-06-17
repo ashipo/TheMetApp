@@ -17,6 +17,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
@@ -206,9 +207,11 @@ private fun CloseButton(
     total: Int,
     modifier: Modifier = Modifier,
 ) {
+    val containerColor = ButtonDefaults.filledTonalButtonColors().containerColor.copy(alpha = 0.5f)
     FilledTonalButton(
         onClick = onClick,
         contentPadding = PaddingValues(start = 24.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
+        colors = ButtonDefaults.filledTonalButtonColors().copy(containerColor = containerColor),
         modifier = modifier
     ) {
         Text("$current / $total")
