@@ -3,8 +3,11 @@
 package com.ashipo.metropolitanmuseum.ui.imageviewer
 
 import androidx.activity.compose.LocalActivity
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope.ResizeMode
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -102,7 +105,14 @@ fun ImageViewerScreen(
             ?: throw IllegalStateException("No Scope found")
         val pagerState = rememberPagerState(initialImageIndex) { images.size }
         // Close button
-        if (showUI) {
+        AnimatedVisibility(
+            visible = showUI,
+            enter = fadeIn(),
+            exit = fadeOut(),
+            modifier = Modifier
+                .zIndex(1f)
+                .align(Alignment.TopEnd)
+        ) {
             with(sharedTransitionScope) {
                 with(animatedVisibilityScope) {
                     CloseButton(
@@ -110,8 +120,6 @@ fun ImageViewerScreen(
                         current = pagerState.currentPage + 1,
                         total = images.size,
                         modifier = Modifier
-                            .zIndex(1f)
-                            .align(Alignment.TopEnd)
                             .windowInsetsPadding(
                                 WindowInsets.systemBarsIgnoringVisibility
                                     .union(WindowInsets.displayCutout)
