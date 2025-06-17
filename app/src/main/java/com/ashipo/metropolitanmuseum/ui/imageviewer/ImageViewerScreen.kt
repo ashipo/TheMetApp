@@ -7,15 +7,18 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope.ResizeMode
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,6 +34,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.core.view.WindowCompat
@@ -41,6 +46,7 @@ import com.ashipo.metropolitanmuseum.R
 import com.ashipo.metropolitanmuseum.ui.LocalAnimatedVisibilityScope
 import com.ashipo.metropolitanmuseum.ui.LocalSharedTransitionScope
 import com.ashipo.metropolitanmuseum.ui.model.ArtworkImage
+import com.ashipo.metropolitanmuseum.ui.theme.MetropolitanMuseumTheme
 import com.ashipo.metropolitanmuseum.ui.util.SharedElementType
 import com.ashipo.metropolitanmuseum.ui.util.SharedKey
 import com.github.panpf.sketch.rememberAsyncImageState
@@ -87,12 +93,15 @@ fun ImageViewerScreen(
             ?: throw IllegalStateException("No Scope found")
         val animatedVisibilityScope = LocalAnimatedVisibilityScope.current
             ?: throw IllegalStateException("No Scope found")
+        val pagerState = rememberPagerState(initialImageIndex) { images.size }
         // Close button
         if (showUI) {
             with(sharedTransitionScope) {
                 with(animatedVisibilityScope) {
-                    FilledTonalIconButton(
+                    CloseButton(
                         onClick = dropUnlessResumed { onNavigateBack() },
+                        current = pagerState.currentPage + 1,
+                        total = images.size,
                         modifier = Modifier
                             .zIndex(1f)
                             .align(Alignment.TopEnd)
@@ -102,14 +111,11 @@ fun ImageViewerScreen(
                                 zIndexInOverlay = 1f
                             )
                             .animateEnterExit()
-                    ) {
-                        Icon(Icons.Default.Close, stringResource(R.string.close))
-                    }
+                    )
                 }
             }
         }
 
-        val pagerState = rememberPagerState(initialImageIndex) { images.size }
         HorizontalPager(
             state = pagerState,
             modifier = Modifier
@@ -190,5 +196,32 @@ fun ImageViewerScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun CloseButton(
+    onClick: () -> Unit,
+    current: Int,
+    total: Int,
+    modifier: Modifier = Modifier,
+) {
+    FilledTonalButton(
+        onClick = onClick,
+        contentPadding = PaddingValues(start = 24.dp, end = 8.dp, top = 8.dp, bottom = 8.dp),
+        modifier = modifier
+    ) {
+        Text("$current / $total")
+        Spacer(Modifier.width(8.dp))
+        Icon(Icons.Default.Close, stringResource(R.string.close))
+    }
+}
+
+@PreviewLightDark
+@Preview(name = "RTL", locale = "ar")
+@Composable
+private fun CloseButtonPreview() {
+    MetropolitanMuseumTheme {
+        CloseButton({}, 2, 11)
     }
 }
