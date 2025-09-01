@@ -15,23 +15,20 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import com.ashipo.metropolitanmuseum.ui.theme.MetropolitanMuseumTheme
-import org.koin.androidx.compose.KoinAndroidContext
 
 @Composable
 fun TheMetApp() {
     MetropolitanMuseumTheme {
-        KoinAndroidContext {
-            Scaffold(
-                contentWindowInsets = WindowInsets(0, 0, 0, 0),
-            ) { padding ->
-                SharedTransitionLayout {
-                    CompositionLocalProvider(LocalSharedTransitionScope provides this) {
-                        AppNavigation(
-                            modifier = Modifier
-                                .padding(padding)
-                                .consumeWindowInsets(padding)
-                        )
-                    }
+        Scaffold(
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        ) { padding ->
+            SharedTransitionLayout {
+                CompositionLocalProvider(LocalSharedTransitionScope provides this) {
+                    AppNavigation(
+                        modifier = Modifier
+                            .padding(padding)
+                            .consumeWindowInsets(padding)
+                    )
                 }
             }
         }

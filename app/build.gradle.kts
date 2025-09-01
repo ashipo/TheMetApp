@@ -12,12 +12,12 @@ plugins {
 
 android {
     namespace = "com.ashipo.metropolitanmuseum"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.ashipo.metropolitanmuseum"
         minSdk = 27
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -101,9 +101,9 @@ dependencies {
     implementation(libs.okhttp.logging)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
-    implementation(libs.sketch.compose)
+    implementation(libs.sketch.compose.koin)
     implementation(libs.sketch.http)
-    implementation(libs.zoomimage.compose.sketch4)
+    implementation(libs.zoomimage.compose.sketch4.koin)
     testImplementation(platform(libs.junit.bom))
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.junit.vintage.engine)

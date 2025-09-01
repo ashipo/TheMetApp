@@ -40,7 +40,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,14 +57,15 @@ import com.ashipo.metropolitanmuseum.ui.model.ArtworkImage
 import com.ashipo.metropolitanmuseum.ui.theme.MetropolitanMuseumTheme
 import com.ashipo.metropolitanmuseum.ui.util.SharedElementType
 import com.ashipo.metropolitanmuseum.ui.util.SharedKey
+import com.github.panpf.sketch.Sketch
 import com.github.panpf.sketch.rememberAsyncImageState
 import com.github.panpf.sketch.request.ComposableImageRequest
 import com.github.panpf.sketch.request.LoadState
-import com.github.panpf.sketch.sketch
 import com.github.panpf.sketch.state.ThumbnailMemoryCacheStateImage
 import com.github.panpf.zoomimage.SketchZoomAsyncImage
 import com.github.panpf.zoomimage.rememberSketchZoomState
 import com.github.panpf.zoomimage.zoom.FixedScalesCalculator
+import org.koin.mp.KoinPlatform
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -145,8 +145,8 @@ fun ImageViewerScreen(
                 val imageState = rememberAsyncImageState()
                 val zoomState = rememberSketchZoomState()
                 LaunchedEffect(zoomState.zoomable) {
-                    zoomState.zoomable.scalesCalculator = FixedScalesCalculator(2f)
-                    zoomState.zoomable.keepTransformWhenSameAspectRatioContentSizeChanged = true
+                    zoomState.zoomable.setScalesCalculator(FixedScalesCalculator(2f))
+                    zoomState.zoomable.setKeepTransformWhenSameAspectRatioContentSizeChanged(true)
                 }
                 val request = ComposableImageRequest(images[index].originalUrl) {
                     placeholder(ThumbnailMemoryCacheStateImage(images[index].largeUrl))
@@ -174,12 +174,11 @@ fun ImageViewerScreen(
                     )
                 }
                 var isPlaceholderCached by rememberSaveable { mutableStateOf(false) }
-                val context = LocalContext.current
                 LaunchedEffect(Unit) {
-                    context.sketch.memoryCache.withLock(images[index].largeUrl) {
-                        // TODO: Refactor this hack (ask Sketch dev for a better way?)
-                        isPlaceholderCached = keys().any { it.startsWith(images[index].largeUrl) }
-                    }
+                    val sketch = KoinPlatform.getKoin().get<Sketch>()
+                    // TODO: Refactor this hack (ask Sketch dev for a better way?)
+                    isPlaceholderCached = sketch.memoryCache.entries()
+                        .any { it.key.startsWith(images[index].largeUrl) }
                 }
                 // Show UI when "Error, tap to reload"
                 LaunchedEffect(imageState.loadState, isPlaceholderCached) {
