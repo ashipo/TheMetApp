@@ -12,12 +12,12 @@ plugins {
 
 android {
     namespace = "com.ashipo.metropolitanmuseum"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.ashipo.metropolitanmuseum"
         minSdk = 27
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
