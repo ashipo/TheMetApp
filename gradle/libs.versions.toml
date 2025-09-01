@@ -22,8 +22,8 @@ protobufPlugin = "0.9.5"
 protobuf = "4.32.0"
 retrofit = "3.0.0"
 robolectric = "4.16"
-sketch = "4.1.0"
-zoomimage = "1.3.0"
+sketch = "4.3.1"
+zoomimage = "1.4.0"
 
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivity" }
@@ -64,9 +64,9 @@ protobuf-protoc = { group = "com.google.protobuf", name = "protoc", version.ref 
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "converterGson" }
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
-sketch-compose = { group = "io.github.panpf.sketch4", name = "sketch-compose", version.ref = "sketch" }
+sketch-compose-koin = { group = "io.github.panpf.sketch4", name = "sketch-compose-koin", version.ref = "sketch" }
 sketch-http = { group = "io.github.panpf.sketch4", name = "sketch-http", version.ref = "sketch" }
-zoomimage-compose-sketch4 = { group = "io.github.panpf.zoomimage", name = "zoomimage-compose-sketch4", version.ref = "zoomimage" }
+zoomimage-compose-sketch4-koin = { group = "io.github.panpf.zoomimage", name = "zoomimage-compose-sketch4-koin", version.ref = "zoomimage" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
