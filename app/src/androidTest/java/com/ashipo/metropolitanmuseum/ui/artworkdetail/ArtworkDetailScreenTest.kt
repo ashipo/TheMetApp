@@ -8,6 +8,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performScrollToNode
 import com.ashipo.metropolitanmuseum.ui.artworkdetail.ArtworkDetailScreenAction.GoBack
 import com.ashipo.metropolitanmuseum.ui.artworkdetail.ArtworkDetailScreenAction.ShowImages
@@ -129,7 +130,9 @@ class ArtworkDetailScreenTest {
         composeTestRule.apply {
             val tag = "preview:$expectedIndex"
             // Scroll to a preview
-            onNodeWithTag("previews").performScrollToNode(hasTestTag(tag))
+            onNodeWithTag("previews")
+                .performScrollTo()
+                .performScrollToNode(hasTestTag(tag))
             // Click the preview
             onNodeWithTag(tag).performClick()
             // Click the main image

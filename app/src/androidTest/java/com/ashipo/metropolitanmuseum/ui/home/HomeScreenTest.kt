@@ -437,7 +437,10 @@ class HomeScreenTest {
                 performClick()
             }
             // remove a tag
-            onNodeWithText("Glass").performClick()
+            onNodeWithText("Glass").apply {
+                performScrollTo()
+                performClick()
+            }
         }
 
         assertEquals(HomeScreenAction.SetMedium(listOf("Cement")), performedAction)
