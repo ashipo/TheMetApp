@@ -5,7 +5,7 @@ import androidx.paging.PagingState
 import com.ashipo.metropolitanmuseum.data.ArtworksRepository
 import com.ashipo.metropolitanmuseum.ui.model.ArtworkInfo
 
-const val PAGE_SIZE = 15
+const val PAGE_SIZE = 10
 
 class ArtworkPagingSource(
     private val artworksRepository: ArtworksRepository,
